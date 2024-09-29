@@ -1,0 +1,611 @@
+================Math  Function================
+●int math.abs(x)
+取绝对值
+
+●int math.ceil(x)
+向上取整
+
+●int math.floor(x)
+向下取整
+
+●int math.max(x, ...)
+取最大
+
+●int math.min(x, ...)
+取最小
+
+================Lua  Function================
+●int tonumber(e [, base])
+这个函数会尝试将它的参数转换为数字，如果参数已经是一个数字或者是一个可以转换成数字的字符串，那么这个函数就会返回转换后的数字，否者返回nil表示无法转换。
+这个函数有一个额外的参数base可以来指定参数的进制
+
+●void table.insert(table, [pos,] value)
+在table的数组部分指定位置(pos)插入值为value的一个元素. pos 参数可选, 默认为数组部分末尾
+
+●any table.remove(table, [pos])
+返回table数组部分位于pos位置的元素. 其后的元素会被前移. pos参数可选, 默认为table长度, 即从最后一个元素删起
+
+●void table.unpack(table)
+
+●string string.upper(str)
+字符串全部转为大写字母。
+
+●string string.lower(str)
+字符串全部转为小写字母。
+
+●int,int string.match(str, substr[, i])
+在一个指定的目标字符串 str 中搜索指定的内容 substr，
+如果找到了一个匹配的子串，就会返回这个子串，不存在则返回 nil
+i 指定了搜索的起始位置，默认为 1，可以一个负数，表示从后往前数的字符个数
+
+●int,int string.find(str, findstr[, i])
+在一个指定的目标字符串 str 中搜索指定的内容 findstr，
+如果找到了一个匹配的子串，就会返回这个子串的起始索引和结束索引，不存在则返回 nil
+i 指定了搜索的起始位置，默认为 1，可以一个负数，表示从后往前数的字符个数
+
+●string string.sub(str, i[, j])
+返回字符串 str 从第 i 个字符到第 j 个字符的子串，参数 i 和参数 j 均可以为负数，
+如果省略参数 j，默认为 -1，也就是子串截止到原串的最后。
+
+●string string.gsub(str, findstr, repstr[, num])
+在字符串 str 中，將 findstr 替换成 repstr，num 為替换次数（可以忽略，则全部替换）
+
+================Support Function================
+●Table fusf.CutString(String str, String cut, String dis)
+將 str 用 cut 分割成 Table 後傳回, dis 排除
+
+●Table fusf.GetCardTable(Effect|Card|Group c)
+將 c 轉換成 Card 組成的 Table 後傳回
+
+●Bool fusf.NotNil(...)
+確認 val 非 nil ,空字串, 空集合
+
+●Bool fusf.Get_Constant(_constable, _vals)
+獲取常數性質，用於 fuef:COD 等
+
+●int,int fusf.Get_Loc(String|int loc1, loc2)
+將 loc 轉換成前後兩個區域後傳回(兩個區域以+分開)
+
+●int fusf.M_chk(int val)
+傳回 val 不足 20000000 則加上 20000000 
+
+●Table fusf.PostFix_Trans(String str, Table val)
+將 str 轉換成逆波蘭式的 Table 後傳回
+
+●Bool fusf.IsN(_func)
+用於 fucf 判斷某數值是否為 n
+
+●function fusf.Is_Cons(_func, _key)
+用於 fucf 判斷某常數性質是否為 cons
+
+●function fusf.Get_Func(_c, _func, ...)
+用於 fuef 函數註冊
+
+●function fusf.GetFlag(val, cod[, n1, n2])
+傳回 val 上 cod 的數量, 有 n 則傳回比較結果
+val = tp or e or c
+cod = String or number (+20000000)
+n1 = "+-n", "+-"
+n2 = n
+
+================Card Function================
+●Bool fucf.Filter(c, f, ...)
+检查卡片 c 是否滿足筛选条件 f , ... 為額外參數
+
+●Bool fucf.IsRk(c, String|int n)
+检查卡片 c 階級是否為 n , +n 為 Above , -n 為 Below
+
+●Bool fucf.IsLv(c, String|int n)
+检查卡片 c 等級是否為 n , +n 為 Above , -n 為 Below
+
+●Bool fucf.IsRLv(c, String|int n, Card rc)
+检查卡片 c 對於儀式怪獸 rc 解放等級是否為 n , +n 為 Above , -n 為 Below
+
+●Bool fucf.IsLk(c, String|int n)
+检查卡片 c 連接箭頭是否為 n , +n 為 Above , -n 為 Below
+
+●Bool fucf.IsAtk(c, String|int n)
+检查卡片 c 攻击力是否為 n , +n 為 Above , -n 為 Below
+
+●Bool fucf.IsDef(c, String|int n)
+检查卡片 c 守备力是否為 n , +n 為 Above , -n 為 Below
+
+●Bool fucf.IsSeq(c, String|int n)
+检查卡片 c 的 Sequence 是否為 n , +n 為 Above , -n 為 Below
+
+●Bool fucf.IsPSeq(c, String|int n)
+检查卡片 c 的 PreviousSequence 是否為 n , +n 為 Above , -n 為 Below
+
+●Bool fucf.Not(c, C|E|G|F val)
+检查卡片 c 非卡片 val or 非卡片 val:GetHandler() or 不在 val 內 or 不滿足 val(c)
+
+●Bool fucf.IsSet(c, S|N set)
+检查卡片 c 的字段是否為 set , /分隔
+
+●Bool fucf.AbleTo(c, S loc)
+检查卡片 c 能否送去 loc , 若為 cost 則 *loc
+
+●Bool fucf.CanSp(c, e, type, p, nocheck, nolimit[, int pos, int toplayer, int zone])
+检查卡片 c 是否可以被玩家 p 用效果 e[以 type 方式和 pos 表示形式]特殊召唤[到玩家 toplayer 的区域 zone]
+如果 nocheck==true 则不检查卡片 c 的召唤条件，如果 nolimit==true 则不检查卡片 c 的苏生限制
+
+●Bool fucf.IsCode(c, String|int cod)
+检查卡片 c 的卡名是否為 cod (+20000000)
+
+●Bool fucf.AddCode(c, ...)
+給 c 增加卡名記述 (+20000000)
+
+●Bool fucf.HasCode(c, cod)
+检查卡片 c 是否是有卡名 cod 记述的卡
+
+●Bool fucf.TgChk(Card c[, Effect e])
+检查卡片 c 能否成為 [e 的] 效果對象
+
+●Bool fucf.GChk(Card c)
+检查卡片 c 是否不受到王谷的影響
+
+●Bool fucf.IsImm(c, Effect e)
+检查卡片 c 是否免疫效果 e
+
+●Bool fucf.IsCon(c, int tp)
+检查卡片 c 當前的控制者是否為 tp
+
+●Bool fucf.IsPCon(c, int tp)
+检查卡片 c 位置變化前的控制者是否為 tp
+
+●Bool fucf.IsLoc(c, String loc)
+检查卡片 c 当前的位置是否是 location
+
+●Bool fucf.IsPLoc(c, String loc)
+检查卡片 c 位置變化前的位置是否是 location
+
+●Bool fucf.IsRea(c,rea)
+检查卡片 c 的 reason 是否為 rea
+--召唤
+S, SP
+--移动
+DES --破坏
+REL --解放
+BAT --战斗破坏
+EFF --效果
+--素材
+MAT --作为融合/同调/超量素材或用於儀式/升級召喚
+FU  --用於融合召喚
+SY  --用於同调召喚
+RI  --用於仪式召喚
+XYZ --用於超量召喚
+LI  --用于连接召唤
+--特殊rea
+COS --用於代價或無法支付代價而破壞
+REP --代替
+TEM --暂时
+ADJ --调整（御前试合）
+
+●Bool fucf.IsTyp(c, String|int typ)
+检查卡片 c 的類型是否為 typ
+M   --怪兽卡
+S   --魔法卡
+T   --陷阱卡
+NO  --通常
+EF  --效果
+--
+FU  --融合
+RI  --仪式
+SY  --同调
+XYZ --超量
+PE  --灵摆
+LI  --连接
+--
+SP  --特殊召唤
+SPI --灵魂
+UN  --同盟
+DU  --二重
+TU  --调整
+FL  --翻转
+--
+TOK --衍生物
+QU  --速攻
+CON --永续
+EQ  --装备
+FI  --场地
+COU --反击
+TM  --陷阱怪兽
+
+●Bool fucf.IsSTyp(c, String|int typ)
+检查卡片 c 的召喚類型是否為 typ
+NO  --通常召唤
+FU  --融合召唤
+SY  --同调召唤
+RI  --仪式召唤
+XYZ --超量召唤
+LI  --连接召唤
+PE  --灵摆召唤
+AD  --上级召唤
+SP  --特殊召唤(EFFECT_SPSUMMON_PROC,EFFECT_SPSUMMON_PROC_G 可用Value修改數值)
+DU  --再度召唤（二重）
+FL  --翻转召唤
+
+●Bool fucf.IsOTyp(c, String|int typ)
+检查卡片 c 的原本類型是否為 typ
+M   --怪兽卡
+S   --魔法卡
+T   --陷阱卡
+NO  --通常
+EF  --效果
+--
+FU  --融合
+RI  --仪式
+SY  --同调
+XYZ --超量
+PE  --灵摆
+LI  --连接
+--
+SP  --特殊召唤
+SPI --灵魂
+UN  --同盟
+DU  --二重
+TU  --调整
+FL  --翻转
+--
+TOK --衍生物
+QU  --速攻
+CON --永续
+EQ  --装备
+FI  --场地
+COU --反击
+TM  --陷阱怪兽
+
+●Bool fucf.IsAtt(c, String att)
+检查卡片 c 的屬性是否為 att
+A   --All
+EA  --地
+WA  --水
+FI  --炎
+WI  --风
+LI  --光
+DA  --暗
+GO  --神
+
+●Bool fucf.IsRac(c, String|int rac)
+检查卡片 c 的種族是否為 rac
+A   --All
+WA  --战士
+SP  --魔法师
+AN  --天使
+DE  --恶魔
+ZO  --不死
+MA  --机械
+AQ  --水
+PY  --炎
+RO  --岩石
+WB  --鸟兽
+PL  --植物
+IN  --昆虫
+TH  --雷
+DR  --龙
+BE  --兽
+BW  --兽战士
+DI  --恐龙
+FI  --鱼
+WD  --海龙
+RE  --爬虫类
+PS  --念动力
+GB  --幻神兽
+GO  --创造神
+WY  --幻龙
+CY  --电子界
+IL  --幻想魔
+
+●Bool fucf.IsPos(c, String|int pos)
+检查卡片 c 的表示形式是否為 pos
+FUA --表侧攻击
+FDA --(reserved)
+FUD --表侧守备
+FDD --里侧守备
+--
+FU  --正面表示
+FD  --里侧表示
+A   --攻击表示
+D   --守备表示
+
+●Bool fucf.IsPPos(c, String|int pos)
+检查卡片 c 位置變化前的表示形式是否為 pos
+FUA --表侧攻击
+FDA --(reserved)
+FUD --表侧守备
+FDD --里侧守备
+--
+FU  --正面表示
+FD  --里侧表示
+A   --攻击表示
+D   --守备表示
+
+================Group   Function================
+●Group fugf.Get(int p, Str loc)
+返回以 p 来看的 loc (自己以及對方區域以+分開)位置的卡
+
+●Group fugf.Filter(Group g, Func f[, Any v, int n])
+过滤函数，从卡片组 g 中筛选满足筛选条件 f 的卡， v 為 f 的參數
+若有 n 返回 #g >= n
+
+●Group fugf.GetFilter(int p, Str loc, Func f[, Any v, int n])
+过滤函数，以 p 来看的 loc (自己以及對方區域以+分開)位置的卡中筛选满足筛选条件 f 的卡， v 為 f 的參數
+若有 n 返回 #g >= n
+
+●Group fugf.SelectFilter(int p, Str loc, Func f[, Any v, int min = 1, int max = min, int sp = p, Card|Group c])
+以 p 来看的 loc (自己以及對方區域以+分開)位置的卡中筛选满足筛选条件 f 并且不等于 c 的卡， v 為 f 的參數
+返回由 sp 從中選擇 min 到 max 數量的卡
+
+●Group fugf.SelectTg(int p, Str loc, Func f[, Any v, int min = 1, int max = min, int sp = p, Card|Group c])
+以 p 来看的 loc (自己以及對方區域以+分開)位置的卡中筛选满足筛选条件 f 并且不等于 c 的卡， v 為 f 的參數
+返回由 sp 從中選擇 min 到 max 數量的卡(取對象)
+需額外檢測是否能成效果對象
+
+================Effect  Function================
+●fuef fuef.Creat(_typ, _cod, _owner, _handler, _ignore)
+創建1個 fuef 並設置 type 及 code 並注册
+
+●fuef fuef.__call(_cod, _handler, _ignore)
+複製 fuef 並重新設置 cod 及 handler (不填默認為原本的), 傳回複製的 fuef
+
+●fuef fuef.__call(_owner, _handler, _ignore)
+注册 Noc 函數
+
+●fuef fuef.Reg(handler, ignore)
+註冊 fuef 给 handler, 没有则注册给 owner 
+fuef:Reg(true) 等同 fuef:Reg(nil, true)
+handler = false 則不註冊 (用於天氣類效果
+ignore = true 則無視免疫
+
+●fuef fuef.RCreat()
+重置 fuef 並以 fuef 的 owner 再創建一個效果
+
+●fuef fuef.SetKey()
+設置 fuef.e 的屬性(不包含注册)
+
+●fuef fuef.Reload()
+同 self:RCreat():SetKey():Reg()
+若為 Noc 函數則返回 self
+
+●fuef fuef.NotNil(from, ...)
+檢測 ... 非全 nil 若 fuef.DebugMode 為 true 則印出錯誤
+
+●fuef fuef.I() or (owner[, cod, handler, ignore])
+Ignition
+接受 Key : cat, pro, ran, ctl, con, cos, tg, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.FG() or (owner[, handler, ignore])
+FIELD + GRANT
+接受 Key : ran, tran, con, tg, obj
+若為 () 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.A(cod or "FC") or (owner[, cod, handler, ignore])
+Activate
+接受 Key : cat, pro, ran, ctl, con, cos, tg, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.QO(cod or "FC") or (owner[, cod, handler, ignore])
+QUICK_O
+接受 Key : cat, pro, ran, ctl, con, cos, tg, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.QF(cod or "FC") or (owner[, cod, handler, ignore])
+QUICK_F
+接受 Key : cat, pro, ran, ctl, con, cos, tg, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.FTO(cod) or (owner[, cod, handler, ignore])
+FIELD + TRIGGER_O
+接受 Key : cat, pro, ran, ctl, con, cos, tg, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.FTF(cod) or (owner[, cod, handler, ignore])
+FIELD + TRIGGER_F
+接受 Key : cat, pro, ran, ctl, con, cos, tg, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.STO(cod) or (owner[, cod, handler, ignore])
+SINGLE + TRIGGER_O
+cod = cod or "FC"
+接受 Key : cat, pro, ctl, con, cos, tg, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.STF(cod) or (owner[, cod, handler, ignore])
+SINGLE + TRIGGER_F
+接受 Key : cat, pro, ctl, con, cos, tg, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.S(cod) or (owner[, cod, handler, ignore])
+SINGLE
+接受 Key : pro, ran, val, ctl, con, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.SC(cod) or (owner[, cod, handler, ignore])
+SINGLE + CONTINUOUS
+接受 Key : pro, ran, ctl, con, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.F(cod) or (owner[, cod, handler, ignore])
+FIELD
+接受 Key : pro, ran, tran, val, ctl, con, tg, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.FC(cod) or (owner[, cod, handler, ignore])
+FIELD + CONTINUOUS
+接受 Key : pro, ran, ctl, con, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.E(cod) or (owner[, cod, handler, ignore])
+Equip
+接受 Key : pro, val, con
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.EC(cod) or (owner[, cod, handler, ignore])
+Equip + CONTINUOUS
+接受 Key : con, tg, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.X(cod) or (owner[, cod, handler, ignore])
+XMATERIAL
+接受 Key : pro, ran, val, ctl, con, op
+若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
+
+●fuef fuef.DES(_code, _id)
+S, SP, AD    --召唤, 特殊召唤, 上级召唤
+SET, FS  --盖放, 反转召唤
+PE, SY, XYZ, LI, FU, RI
+--移动
+TD, TG, TH, RE
+SH  --检索
+DES --破坏
+REL --解放
+DR  --抽卡
+EQ  --装备
+HD  --捨棄手牌
+DD  --卡组送墓或特殊召唤
+--改变
+POS, CON --改变表示形式, 控制权
+ATK, DEF --改变攻击, 防御
+--基本分
+DAM, REC --基本分伤害, 回复
+
+●fuef fuef.COD(_val)
+FC  --自由时点（强脱等，还有昴星团等诱发即时效果）
+ADJ --adjust_all()调整後（御前试合）
+--移动
+TD, TG, TH, RE, MO --移动
+--召唤
+S,  PS    --通常召唤 时, 之际
+SP, PSP   --特殊召唤 时, 之际
+FS, PFS   --翻转召唤 时, 之际
+DES, PDES --被破坏时 (移動前)
+LEA, PLEA --离场时   (移動前)
+BM, PBM   --作为同调/超量/连结/上级/仪式/融合召唤的素材 (移動前)
+--
+DR    --抽卡时
+F     --翻转时
+RO    --去除超量素材时
+GLEA  --离开墓地时
+POS   --表示形式变更时
+REL   --解放时
+HD    --丢弃手牌时
+--无效
+NEGA  --发动无效
+NEGE  --效果无效
+NEGS  --召唤被无效时
+NEGFS --反转召唤被无效时
+NEGSP --特殊召唤被无效时
+--连锁
+CH    --效果发动时
+CHED  --连锁处理结束时
+----组合时点
+PHS   --阶段开始时 ex: "PHS+DR"
+
+●fuef fuef.CAT(_val)
+SH  --SE+TH
+--召唤
+S, SP
+FU  --融合召唤效果（暴走魔法阵）
+--移动
+TD, TG, TH, TE, RE
+--
+SE  --检索
+DES --破坏
+REL --解放
+DR  --抽卡
+EQ  --装备
+HD  --捨棄手牌
+DD  --卡组送墓或特殊召唤
+--改变
+POS --改变表示形式
+CON --改变控制权
+ATK --改变攻击
+DEF --改变防御
+--无效
+NEGA --发动无效
+NEGE --效果无效
+NEGS --召唤无效
+--基本分
+DAM --伤害效果
+REC --回复效果
+--其他
+TOK  --含衍生物效果
+COUN --指示物效果
+COIN --硬币效果
+DICE --骰子效果
+ANN  --發動時宣言卡名的效果
+--特殊cat
+GA  --包含特殊召喚以外移動墓地的卡的效果（屋敷わらし）
+GL  --涉及墓地的效果(王家長眠之谷)
+GS  --包含從墓地特殊召喚的效果（屋敷わらし、冥神）
+
+●fuef fuef.PRO(_val)
+TG   --取对象效果
+PTG  --含有"以玩家为对象"的特性（精靈之鏡）、影響玩家的永續型效果(SetTargetRange()改成指定玩家)
+CTG  --建立持續對象的永續魔法/永續陷阱/早埋系以外的裝備魔法卡
+DE   --場合型誘發效果、用於永續效果的EFFECT_TYPE_CONTINUOUS
+SR   --只对自己有效
+HINT --客户端提示
+O    --誓约效果
+AR   --影响所有区域的卡（大宇宙）
+IG   --无视效果免疫
+CD   --效果不会被无效
+CN   --可被禁止令停止適用的效果（與EFFECT_FLAG_CANNOT_DISABLE並用）
+CC   --不能复制的原始效果（效果外文本）
+SET  --裡側狀態可發動的效果、影响场上里侧的卡的永續型效果
+DAM  --可以在伤害步骤发动
+CAL  --可以在伤害计算时发动
+OP   --发动/处理效果的玩家为触发事件的玩家而不是卡片的持有者，如仪式魔人，万魔殿
+NR   --这张卡在场上只能发动一次的效果
+----组合时点
+OE   --CD + CC(out effect)
+
+●fuef fuef.CTL(_count, _code, _pro)
+(1, n), (1, "D"), (1, "n+D"), (1, "m+D")
+(1), (m), ("m+D"), ("n+D"), ("D")
+O    --发动次数限制(誓约次数, 发动被无效不计数)
+D    --决斗中使用次数
+C    --同一连锁中使用次数
+
+●fuef fuef.VAL(_val)
+
+●fuef fuef.Func(_val, _func, ...)
+("val,con,cos(v1,v2),tg,op") or ("con(v1,v2),op") or (val, "con,op(v1, v2)")
+if v = %1~n then { ... } is value table
+if cant chk then Follow a sequence (val,con,cos,tg,op
+
+●fuef fuef.RES(_flag, _count)
+a+b/b/b
+SELF --自己回合的階段重置
+OPPO --对方回合的階段重置
+CH   --连锁结束重置
+DIS  --效果无效重置(只適用於owner==handler的效果)
+SET  --变里侧重置
+TG   --去墓地重置
+TH   --回手牌或加入手牌重置
+TD   --回卡组重置
+TF   --除了返回场上以外，从不同区域移动到怪兽区或魔法区
+RE   --除外重置
+TRE  --暂时除外重置
+LEA  --从怪兽区或魔法区到不同区域
+CON  --控制者变更重置
+O    --超量叠放重置
+MSC  --从怪兽区到魔法区，或者从魔法区到怪兽区(move_to_field()、寶玉獸)
+----组合时点 /
+EV   --指定的條件下重置
+PH   --阶段结束重置
+----组合时点
+STD  --TF + LEA + TD + TH + TRE + RE + TG + SET
+RED  --STD + O + MSC - TF - LEA (EFFECT_LEAVE_FIELD_REDIRECT)
+
+●fuef fuef.initial(_lib, _glo, _exop_func, ...)
+設定 cm 的 initial_effect 並設定 cm.lib = _lib
+若有 _glo 則 cm[_glo] = {0, 0}
+若有 _ex_op 則執行 _ex_op(c, cm)
+會自動註冊 cm.e1 ~ cm.en 以及 cm.pre.e1 ~ cm.pre.en (庫內預註冊
+
+●fuef fuef.cos_in_tg(e,tp,eg,ep,ev,re,r,rp,chk)
+cost 在 tg 内 (金满类
+	e:SetLabel(100)
+	if chk==0 then return true end
