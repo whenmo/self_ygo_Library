@@ -1,6 +1,6 @@
 require("expansions/script/c20099997")
 if fuef then return end
-fuef = { } --2024/9/28
+fuef = { } --2024/10/4
 fuef.__index = fuef 
 fuef.DebugMode = false
 ---------------------------------------------------------------- Standard Register
@@ -246,14 +246,14 @@ function fuef:PRO(_val)
 	return self:Cons_Model("pro", _val)
 end
 ----------------------------------------------------------------RAN and TRAN
-function fuef:RAN(_val)
-	if not fuef.NotNil("RAN", _val) then return self end  -- nil chk
-	self.ran = fusf.Get_Loc(_val, nil, "fuef:RAN()")
+function fuef:RAN(_loc)
+	if not fuef.NotNil("RAN", _loc) then return self end  -- nil chk
+	self.ran = fusf.Get_Loc(_loc, nil, "fuef:RAN()")
 	return self:Reload("RAN")
 end
-function fuef:TRAN(_val1, _val2)
-	if not fuef.NotNil("TRAN", _val1, _val2) then return self end  -- nil chk
-	self.tran = {fusf.Get_Loc(_val1, _val2, "fuef:TRAN()")}
+function fuef:TRAN(_loc1, _loc2)
+	if not fuef.NotNil("TRAN", _loc1, _loc2) then return self end  -- nil chk
+	self.tran = {fusf.Get_Loc(_loc1, _loc2, "fuef:TRAN()")}
 	return self:Reload("TRAN")
 end
 ----------------------------------------------------------------CTL
@@ -266,24 +266,25 @@ function fuef:CTL(_count, _code, _pro) --count, code, pro
 	if type(_count) == "string" or _count > 99 then -- ("n+D") or (m) -> (1, "n+D") or (1, m)
 		_count, _code, _pro = 1, _count, _code 
 	end
-	local res, cal_tab = {0, 0}, {
-		m = self.e:GetOwner():GetOriginalCode(),
+	local res, ctl_val = {0, 0}, {
 		O = EFFECT_COUNT_CODE_OATH,
 		D = EFFECT_COUNT_CODE_DUEL,
 		C = EFFECT_COUNT_CODE_CHAIN,
 	}
 	if _pro then -- (1, n, "D")
-		res[1] = fusf.M_chk(_code) + cal_tab(_pro:match("[ODC]"))
-	else -- (1, "n+D")
+		res[1] = fusf.M_chk(_code) + ctl_val[_pro:match("[ODC]")]
+	elseif type(_code) == "string" then -- (1, "n+D")
 		res = fusf.CutString(_code, "+", "CTL_1") -- (n), (n, d), (d)
 		if res[1]:match("[ODC]") then
 			res = {0, res[1]}
+		elseif res[1]:match("m") then
+			res[1] = self.e:GetOwner():GetOriginalCode()
 		else
-			res[1] = cal_tab(res[1]:match("m")) or fusf.M_chk(tonumber(res[1]))
+			res[1] = fusf.M_chk(tonumber(res[1]))
 		end
-		if res[2] then res[2] = cal_tab(res[2]:match("[ODC]")) end
+		if res[2] then res[2] = ctl_val[res[2]:match("[ODC]")] end
 		if res[2] & 0x30000000 > 0 and res[1] == 0 then res[1] = self.e:GetOwner():GetOriginalCode() end -- is O or D
-	else
+	end
 	self.ctl = {_count, res[1] + res[2]}
 	return self:RCreat():SetKey("CTL"):Reg()
 end -- 285
@@ -299,34 +300,28 @@ function fuef:Func(_val, _func, ...)
 	else	--  _val is _func
 		vals, _func = {_func, ...}, _val
 	end
-	-- _val is func (func place, f(v1,v2,v3) chk and temp and set in Func
-	local place, f_chk, f_temp, sets = 1, 0, "", { }
-	for i, func in ipairs(fusf.CutString(_func, ",", "Func")) do
-		local is_st = func:match("%(")
-		local is_ed = func:match("%)")
-		-- is f(v1)
-		if is_st and is_ed then
-			place = self:Set_Func_Val(i - f_chk, place, func, vals)
-			sets[#sets + 1] = ({"val", "con", "cos", "tg", "op"})[place]
-		-- is f(v1,v2,v3) st f(v1
-		elseif is_st then
-			f_temp, f_chk = func, f_chk + 1
-		-- is f(v1,v2,v3) ed v3)
-		elseif is_ed then
-			place = self:Set_Func_Val(i - f_chk, place, f_temp..","..func, vals)
-			sets[#sets + 1] = ({"val", "con", "cos", "tg", "op"})[place]
-			f_temp = ""
-		-- is f(v1,v2,v3) mid v2 
-		elseif #f_temp > 0 then
-			f_temp, f_chk = f_temp..","..func, f_chk + 1
-		-- is normal func
-		elseif fusf.NotNil(func) then
-			place = self:Set_Func_Val(i - f_chk, place, func, vals)
-			sets[#sets + 1] = ({"val", "con", "cos", "tg", "op"})[place]
+	-- "val,con,cos,tg,op" or "con,op" , if cant match then follow a sequence
+	local seqs, place, sets = {"val", "con", "cos", "tg", "op"}, 1, { }
+	 -- "f1,f2(%1,v2),f3" -> {"f1", {"f2", vals[1], "v2"}, "f3"}, ... use in vi = %i
+	for i, func in fusf.ForTable(fusf.Val_Cuts(_func, table.unpack(vals))) do
+		if type(func) ~= "table" then func = { func } end
+		local fname = func[1]
+		-- find fname can match seqs
+		local match = 0
+		for j = place, 5 do
+			local temp = fname:find(seqs[j])
+			if temp and temp > match then
+				place, match = j, temp
+			end
 		end
+		-- cant match seqs
+		if match == 0 then place = i end
+		-- set self[key] and save key
+		fname = seqs[place]
+		self[fname], sets[#sets + 1] = func, fname
 	end
 	if not self.e then return self end
-	-- self[key] = { func, ... }
+	-- self[key] = {func, ...}
 	if sets[1] == "val" then
 		table.remove(sets, 1)
 		local val = self.val[1]
@@ -344,22 +339,6 @@ function fuef:Func(_val, _func, ...)
 	end
 	return self:RCreat():SetKey("Func"):Reg()
 end
-function fuef:Set_Func_Val(cant_match, place, func, vals)
-	-- "val,con,cos,tg,op" or "con,op" , if cant match then follow a sequence
-	local seqs = {"val", "con", "cos", "tg", "op"}
-	local match = 0
-	for j = place, 5 do -- find can match seqs
-		local temp = func:find(seqs[j])
-		if temp and temp > match then
-			place, match = j, temp
-		end
-	end
-	if match == 0 then place = cant_match end -- cant match seqs
-	local res = { func }
-	if func:match("%%") then res = {func, table.unpack(vals)} end
-	self[seqs[place] ] = res
-	return place
-end
 function fuef:Func_Model(_key, _func, ...)
 	if not fuef.NotNil(_key:upper(), _func) then return self end  -- nil chk
 	if not self.e then  --is Noc
@@ -371,10 +350,9 @@ function fuef:Func_Model(_key, _func, ...)
 	if #vals > 0 then
 		_func = _func.."("
 		for i = 1, #vals do
-			_func = _func.."%"..i
-			if i ~= #vals then _func = _func.."," end
+			_func = _func.."%"..i..","
 		end
-		_func = _func..")"
+		_func = _func:sub(1, #_func - 1)..")"
 	end
 	self[_key] = val_chk or fusf.Get_Func(self.e:GetOwner(), _func, ...)
 	if not self[_key] and fuef.DebugMode then Debug.Message(_key.." Func value is nil") end
@@ -444,18 +422,18 @@ end
 --------------------------------------------------------------------------"Support Effect function"
 function fuef.initial(_lib, _glo, _exop_func, ...)
 	local cm, m = GetID()
+	local exop_val = { ... }
 	cm.pre = {}
 	cm.initial_effect = function(c)
 		if _lib then cm.lib = _lib end  -- set lib
 		-- do ex_op
 		if _exop_func then 
-			local exop_val, place = { ... }, 1
+			local place = 1
 			if type(_exop_func) ~= "table" then _exop_func = { _exop_func } end
 			for _, exop_func in ipairs(_exop_func) do
 				if type(exop_func) == "string" then 
 					for _, func in ipairs(fusf.CutString(exop_func, ",", "fuef.initial")) do
-						func = fucf[func] or Card[func]
-						exop(c, exop_val[place])
+						(fucf[func] or Card[func])(c, exop_val[place])
 						place = place + 1
 					end
 				else
@@ -464,26 +442,19 @@ function fuef.initial(_lib, _glo, _exop_func, ...)
 				end
 			end
 		end
-		-- do e1 ~ en
-		local n = 1
-		while cm["e"..n] do
-			cm["e"..n](c)
-			n = n + 1
+		local dof = function(_tab, _name, _exval)
+			local n = 1
+			while _tab[_name..n] do
+				_tab[_name..n](c, _exval)
+				n = n + 1
+			end
 		end
-		-- do e1 ~ en in lib pre set
-		n = 1
-		while cm.pre["e"..n] do
-			cm.pre["e"..n](c)
-			n = n + 1
-		end
+		dof(cm, "e")		-- do e1 ~ en
+		dof(cm.pre, "e")	-- do e1 ~ en in lib pre set
 		-- if cm[_glo] then do ge1 ~ gen
 		if not (_glo and not cm[_glo]) then return end
 		cm[_glo] = {0, 0}
-		n = 1
-		while cm["ge"..n] do
-			cm["ge"..n](c, 1)
-			n = n + 1
-		end
+		dof(cm, "ge", 1)
 	end
 	return cm, m
 end

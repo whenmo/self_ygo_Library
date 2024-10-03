@@ -3,40 +3,45 @@ if fusf then return end
 fusf = { }
 --------------------------------------"Support function"
 function fusf.CutString(_str, _cut, _from)
-	if type(_str) ~= "string" then Debug.Message(_from.."CutString <- ") end
-	local _str = _str.._cut
-	local list, index, ch = {}, 1, ""
-	while index <= #_str do
-		if _str:sub(index, index):match(_cut) then
-			list[#list + 1] = ch
-			ch = ""
+	if type(_str) ~= "string" then Debug.Message("Invalid _str in CutString <- ".._from) end
+	if type(_cut) ~= "string" or #_cut == 0 then Debug.Message("Invalid _cut in CutString <- ".._from) end
+	local str, list, char = _str.._cut, {}, ""
+	for unit in str:gmatch(".") do
+		if unit == _cut then
+			table.insert(list, char)
+			char = ""
 		else
-			_, index, ch = _str:find("^([^".._cut.."]+)", index)
+			char = char..unit
 		end
-		index = index + 1
 	end
 	return list
 end
-function fusf.GetCardTable(c)
-	local C = {}
-	if aux.GetValueType(c) == "Effect" then
-		C[1] = c:GetHandler()
-	elseif aux.GetValueType(c) == "Card" then
-		C[1] = c
-	elseif aux.GetValueType(c) == "Group" then
-		for i in aux.Next(c) do
-			C[#C+1] = i
+function fusf.GetCardTable(_c)
+	local cs, typ = { }, aux.GetValueType(_c)
+	if typ == "Effect" then
+		cs[1] = _c:GetHandler()
+	elseif typ == "Card" then
+		cs[1] = _c
+	elseif typ == "Group" then
+		for c in aux.Next(_c) do
+			cs[#cs+1] = c
 		end
 	end
-	return C 
+	return cs
+end
+function fusf.IsNil(...)
+	local vals = {...}
+	if #vals == 0 then return true end
+	vals = #vals == 1 and vals[1] or vals
+	if type(vals) == "string" then
+		return vals == ""  -- 非空字串
+	elseif type(vals) == "table" then
+		return not next(vals)  -- 表有內容
+	end
+	return not vals
 end
 function fusf.NotNil(...)
-	local lists = {...}
-	if #lists == 0 then return false end
-	if #lists == 1 then lists = lists[1] end
-	if type(lists) == "string" then return #lists > 0 end
-	if type(lists) == "table" then return #lists > 0 end
-	return true
+	return not fusf.IsNil(...)
 end
 function fusf.Get_Constant(_constable, _vals)
 	-- string chk
@@ -46,7 +51,7 @@ function fusf.Get_Constant(_constable, _vals)
 	if _constable == "cod" then 
 		-- EVENT_CUSTOM
 		if _vals:match("CUS") then
-			_vals = _vals:sub(5, #_vals)
+			_vals = _vals:sub(5)
 			-- owner code or number
 			_res = EVENT_CUSTOM + fusf.M_chk(_vals)
 		-- EVENT_PHASE or EVENT_PHASE_START
@@ -92,20 +97,21 @@ function fusf.M_chk(_val)
 	if _val < 19999999 then return _val + 20000000 end
 	return _val
 end
-function fusf.PostFix_Trans(_str, _val)
-	local res, temp, i = { }, { }, 1
+function fusf.PostFix_Trans(_str, ...)
+	local vals, res, temp, i = {...}, { }, { }, 1
 	while i <= #_str do
 		local ch = _str:sub(i, i)
 		if ch:match("%a") then
 			_, i, ch = _str:find("^([%a]+)", i)
 			table.insert(res, ch)
 		elseif ch == "%" then
-			local chk = table.remove(_val, 1)
-			if type(chk) == "boolean" then
-				local b = chk
-				chk = function() return b end
+			_, i, ch = _str:find("^([%d]+)", i)
+			ch = vals[tonumber(ch)]
+			if type(ch) == "boolean" then
+				local b = ch
+				ch = function() return b end
 			end
-			table.insert(res, chk)
+			table.insert(res, ch)
 		elseif ch == "(" or ch == "~" then
 			table.insert(temp, ch)
 		elseif ch == ")" then
@@ -137,16 +143,10 @@ end
 function fusf.IsN(_func)
 	return function(_c, _val, _exval)
 		if type(_val) == "string" and _val:match("[%+%-]") then
-			local st, ed  = _val:find("[%+%-]")
-			if st == 1 then
-				st, ed = 2, #_val
-			else
-				st, ed = 1, #_val -1
-			end
-			local val = math.abs(tonumber(_val:sub(st, ed)))
+			local _, _, val = _str:find("([%d]+)")
 			local Cal = {
-				["+"] = Card[_func](_c, _exval) >= val,
-				["-"] = Card[_func](_c, _exval) <= val
+				["+"] = Card[_func](_c, _exval) >= math.abs(tonumber(val)),
+				["-"] = Card[_func](_c, _exval) <= math.abs(tonumber(val))
 			}
 			return Cal[_val:match("[%+%-]")]
 		end
@@ -190,23 +190,70 @@ function fusf.Get_Func(_c, _func, ...)
 		if #vals > 0 then return func(table.unpack(vals)) end
 		return func
 	end
-	-- _func = "func(a,,b)" -> "func", {"a", "", "b"}
+	-- _func = "func(a,,b)" -> "func", {"a", nil, "b"}
 	local func = _func:sub(1, loc - 1)
 	local f_vals = fusf.CutString(_func:sub(loc + 1, #_func - 1), ",", "Get_Func")
 	-- translate vals 
 	for i, f_val in ipairs(f_vals) do
-		if f_val == "" then 
-			f_vals[i] = nil 
-		elseif tonumber(f_val) then
+		if tonumber(f_val) then
 			f_vals[i] = tonumber(f_val) 
 		elseif f_val:match("%%") then
-			f_vals[i] = vals[tonumber(f_val:sub(2, #f_val))]
+			f_vals[i] = vals[tonumber(f_val:sub(2))]
 		end
 	end
 	for _, Lib in ipairs({cm, lib, fuef, aux}) do
 		if Lib[func] then return Lib[func](table.unpack(f_vals)) end
 	end
 	return nil
+end
+function fusf.Val_Cuts(_val, ...) -- "f1,f2(v1,v2),(v3)" -> {"f1", {"f2", "v1", "v2"}, {"v3"}}, ... use in vi = %i
+	local res, res_ind, temp = { }, 0, { }
+	--local place, f_chk, f_temp, sets = 1, 0, "", { }
+	for _, val in ipairs(fusf.CutString(_val, ",", "Val_Cuts_1")) do
+		res_ind = res_ind + 1
+		local is_st = val:match("%(")
+		local is_ed = val:match("%)")
+		-- is f(v1)
+		if is_st and is_ed then -- f(v1) -> {"f", "v1"}
+			res[res_ind] = fusf.Val_Cuts_Table_Process(val, ...)
+		elseif is_st then -- f(v1,v2,v3) st f(v1
+			temp, res_ind = val, res_ind - 1
+		elseif is_ed then -- f(v1,v2,v3) ed v3) -> {"f", "v1", "v2", "v3"}
+			res[res_ind] = fusf.Val_Cuts_Table_Process(temp..","..val, ...)
+			temp = ""
+		elseif #temp > 0 then -- f(v1,v2,v3) mid v2
+			temp, res_ind = temp..","..val, res_ind - 1
+		elseif val ~= "" then
+			res[res_ind] = val
+		end
+	end
+	res.len = res_ind
+	return res
+end
+function fusf.Val_Cuts_Table_Process(_str, ...) -- "f(%1,,3)" -> {"f", vals[1], nil, "3"}
+	local vals, res, st = {...}, { }, _str:find("%(")
+	if st ~= 1 then res[1] = _str:sub(1, st - 1) end -- has f
+	if st + 1 == #_str then return res end -- "f()" -> {"f"}
+	_str = _str:sub(st + 1, #_str - 1)
+	local res_ind = #res
+	for _, val in ipairs(fusf.CutString(_str, ",", "Val_Cuts_Table_Process")) do
+		res_ind = res_ind + 1
+		if val:match("%%") then
+			res[res_ind] = vals[tonumber(val:sub(2))]
+		elseif val ~= "" then
+			res[res_ind] = val
+		end
+	end
+	res.len = res_ind
+	return res
+end
+function fusf.ForTable(t, n)
+	local i, max = 0, t.len or n
+	return function()
+		if i >= max then return nil end
+		i = i + 1
+		return i, t[i]
+	end
 end
 --------------------------------------"Other Support function"
 function fusf.GetFlag(val, cod, n1, n2)

@@ -63,7 +63,7 @@ i 指定了搜索的起始位置，默认为 1，可以一个负数，表示从�
 ●Bool fusf.Get_Constant(_constable, _vals)
 獲取常數性質，用於 fuef:COD 等
 
-●int,int fusf.Get_Loc(String|int loc1, loc2)
+●int,int fusf.Get_Loc(S|N loc1, loc2)
 將 loc 轉換成前後兩個區域後傳回(兩個區域以+分開)
 
 ●int fusf.M_chk(int val)
@@ -81,6 +81,16 @@ i 指定了搜索的起始位置，默认为 1，可以一个负数，表示从�
 ●function fusf.Get_Func(_c, _func, ...)
 用於 fuef 函數註冊
 
+●Table fusf.Val_Cuts(_val, ...)
+轉換 val 
+用於 fuef:Func 以及 fugf.Filter 
+
+●Table fusf.Val_Cuts_Table_Process(_str, ...)
+用於輔助 fusf.Val_Cuts
+
+●Table fusf.ForTable(t, n)
+用於 for 會將每個值都輸出(包含 nil
+
 ●function fusf.GetFlag(val, cod[, n1, n2])
 傳回 val 上 cod 的數量, 有 n 則傳回比較結果
 val = tp or e or c
@@ -89,31 +99,31 @@ n1 = "+-n", "+-"
 n2 = n
 
 ================Card Function================
-●Bool fucf.Filter(c, f, ...)
+●Bool fucf.Filter(c, S|F f, ...)
 检查卡片 c 是否滿足筛选条件 f , ... 為額外參數
 
-●Bool fucf.IsRk(c, String|int n)
+●Bool fucf.IsRk(c, S|N n)
 检查卡片 c 階級是否為 n , +n 為 Above , -n 為 Below
 
-●Bool fucf.IsLv(c, String|int n)
+●Bool fucf.IsLv(c, S|N n)
 检查卡片 c 等級是否為 n , +n 為 Above , -n 為 Below
 
-●Bool fucf.IsRLv(c, String|int n, Card rc)
+●Bool fucf.IsRLv(c, S|N n, Card rc)
 检查卡片 c 對於儀式怪獸 rc 解放等級是否為 n , +n 為 Above , -n 為 Below
 
-●Bool fucf.IsLk(c, String|int n)
+●Bool fucf.IsLk(c, S|N n)
 检查卡片 c 連接箭頭是否為 n , +n 為 Above , -n 為 Below
 
-●Bool fucf.IsAtk(c, String|int n)
+●Bool fucf.IsAtk(c, S|N n)
 检查卡片 c 攻击力是否為 n , +n 為 Above , -n 為 Below
 
-●Bool fucf.IsDef(c, String|int n)
+●Bool fucf.IsDef(c, S|N n)
 检查卡片 c 守备力是否為 n , +n 為 Above , -n 為 Below
 
-●Bool fucf.IsSeq(c, String|int n)
+●Bool fucf.IsSeq(c, S|N n)
 检查卡片 c 的 Sequence 是否為 n , +n 為 Above , -n 為 Below
 
-●Bool fucf.IsPSeq(c, String|int n)
+●Bool fucf.IsPSeq(c, S|N n)
 检查卡片 c 的 PreviousSequence 是否為 n , +n 為 Above , -n 為 Below
 
 ●Bool fucf.Not(c, C|E|G|F val)
@@ -125,11 +135,12 @@ n2 = n
 ●Bool fucf.AbleTo(c, S loc)
 检查卡片 c 能否送去 loc , 若為 cost 則 *loc
 
-●Bool fucf.CanSp(c, e, type, p, nocheck, nolimit[, int pos, int toplayer, int zone])
-检查卡片 c 是否可以被玩家 p 用效果 e[以 type 方式和 pos 表示形式]特殊召唤[到玩家 toplayer 的区域 zone]
-如果 nocheck==true 则不检查卡片 c 的召唤条件，如果 nolimit==true 则不检查卡片 c 的苏生限制
+●Bool fucf.CanSp(c, e, typ, [p = e:GetHandlerPlayer(), noc = false, nol = false, pos, top, int zone])
+检查卡片 c 是否可以被玩家 p 用效果 e[以 typ 方式和 pos 表示形式]特殊召唤[到玩家 top 的区域 zone]
+noc : 是否忽略检查卡片 c 的召唤条件
+nol : 是否忽略检查卡片 c 的苏生限制
 
-●Bool fucf.IsCode(c, String|int cod)
+●Bool fucf.IsCode(c, S|N cod)
 检查卡片 c 的卡名是否為 cod (+20000000)
 
 ●Bool fucf.AddCode(c, ...)
@@ -147,19 +158,19 @@ n2 = n
 ●Bool fucf.IsImm(c, Effect e)
 检查卡片 c 是否免疫效果 e
 
-●Bool fucf.IsCon(c, int tp)
-检查卡片 c 當前的控制者是否為 tp
+●Bool fucf.IsCon(c, p)
+检查卡片 c 當前的控制者是否為 p
 
-●Bool fucf.IsPCon(c, int tp)
-检查卡片 c 位置變化前的控制者是否為 tp
+●Bool fucf.IsPCon(c, p)
+检查卡片 c 位置變化前的控制者是否為 p
 
-●Bool fucf.IsLoc(c, String loc)
-检查卡片 c 当前的位置是否是 location
+●Bool fucf.IsLoc(c, S loc)
+检查卡片 c 当前的位置是否是 loc
 
-●Bool fucf.IsPLoc(c, String loc)
-检查卡片 c 位置變化前的位置是否是 location
+●Bool fucf.IsPLoc(c, S loc)
+检查卡片 c 位置變化前的位置是否是 loc
 
-●Bool fucf.IsRea(c,rea)
+●Bool fucf.IsRea(c, S|N rea)
 检查卡片 c 的 reason 是否為 rea
 --召唤
 S, SP
@@ -181,7 +192,7 @@ REP --代替
 TEM --暂时
 ADJ --调整（御前试合）
 
-●Bool fucf.IsTyp(c, String|int typ)
+●Bool fucf.IsTyp(c, S|N typ)
 检查卡片 c 的類型是否為 typ
 M   --怪兽卡
 S   --魔法卡
@@ -211,7 +222,7 @@ FI  --场地
 COU --反击
 TM  --陷阱怪兽
 
-●Bool fucf.IsSTyp(c, String|int typ)
+●Bool fucf.IsSTyp(c, S|N typ)
 检查卡片 c 的召喚類型是否為 typ
 NO  --通常召唤
 FU  --融合召唤
@@ -225,7 +236,7 @@ SP  --特殊召唤(EFFECT_SPSUMMON_PROC,EFFECT_SPSUMMON_PROC_G 可用Value修改
 DU  --再度召唤（二重）
 FL  --翻转召唤
 
-●Bool fucf.IsOTyp(c, String|int typ)
+●Bool fucf.IsOTyp(c, S|N typ)
 检查卡片 c 的原本類型是否為 typ
 M   --怪兽卡
 S   --魔法卡
@@ -255,7 +266,7 @@ FI  --场地
 COU --反击
 TM  --陷阱怪兽
 
-●Bool fucf.IsAtt(c, String att)
+●Bool fucf.IsAtt(c, S|N att)
 检查卡片 c 的屬性是否為 att
 A   --All
 EA  --地
@@ -266,7 +277,7 @@ LI  --光
 DA  --暗
 GO  --神
 
-●Bool fucf.IsRac(c, String|int rac)
+●Bool fucf.IsRac(c, S|N rac)
 检查卡片 c 的種族是否為 rac
 A   --All
 WA  --战士
@@ -296,7 +307,7 @@ WY  --幻龙
 CY  --电子界
 IL  --幻想魔
 
-●Bool fucf.IsPos(c, String|int pos)
+●Bool fucf.IsPos(c, S|N pos)
 检查卡片 c 的表示形式是否為 pos
 FUA --表侧攻击
 FDA --(reserved)
@@ -308,7 +319,7 @@ FD  --里侧表示
 A   --攻击表示
 D   --守备表示
 
-●Bool fucf.IsPPos(c, String|int pos)
+●Bool fucf.IsPPos(c, S|N pos)
 检查卡片 c 位置變化前的表示形式是否為 pos
 FUA --表侧攻击
 FDA --(reserved)

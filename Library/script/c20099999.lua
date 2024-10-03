@@ -66,6 +66,7 @@ fucs.des = {
 	DAM = 20099999*16 + 11  ,   --基本分伤害
 	REC = 20099999*16 + 12  ,   --基本分回复
 	--特殊
+	PUB = 66  ,   --持续公开
 	--SP = 1159   ,  --当魔法卡盖放
 	--SP = 1160   ,  --在灵摆区域发动
 }
@@ -220,7 +221,7 @@ fucs.pro = {
 	CAL = EFFECT_FLAG_DAMAGE_CAL		,   --可以在伤害计算时发动
 	OP  = EFFECT_FLAG_EVENT_PLAYER  ,   --发动/处理效果的玩家为触发事件的玩家而不是卡片的持有者，如仪式魔人，万魔殿
 	NR  = EFFECT_FLAG_NO_TURN_RESET  ,   --发条等“这张卡在场上只能发动一次”的效果
-	OE  = 0x40400			 ,   --EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE(out effect)
+	OE  = 0x40400			,   --EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE(out effect)
 }
 --Location Variable
 fucs.ran = {
