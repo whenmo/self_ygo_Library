@@ -1,75 +1,102 @@
+###############################################
+# 脚本中用到的数据类型为以下几类：
+# N:		整数类型
+# B:		布尔类型(true 或者 false)
+# S:		字符串
+# F:		函数
+# C:		卡片类
+# E:		效果类
+# G:		卡片组类
+# T:		表类型
+# nil:		空类型，也表示空的变量
+# any:		任意类型
+# 为方便说明，采用类似C的函数表示方法说明
+# []表示有默认值可省略的参数
+# 只说明有意义的nil类型参数或返回值
+##############################################
+
 ================Math  Function================
-●int math.abs(x)
+●int math.abs(N)
 取绝对值
 
-●int math.ceil(x)
+●int math.ceil(N)
 向上取整
 
-●int math.floor(x)
+●int math.floor(N)
 向下取整
 
-●int math.max(x, ...)
+●int math.max(N, ...)
 取最大
 
-●int math.min(x, ...)
+●int math.min(N, ...)
 取最小
 
 ================Lua  Function================
-●int tonumber(e [, base])
-这个函数会尝试将它的参数转换为数字，如果参数已经是一个数字或者是一个可以转换成数字的字符串，那么这个函数就会返回转换后的数字，否者返回nil表示无法转换。
-这个函数有一个额外的参数base可以来指定参数的进制
+●int tonumber(val [, base])
+这个函数会尝试将 val 转换为数字，如果参数已经是一个数字或者是一个可以转换成数字的字符串，那么这个函数就会返回转换后的数字，否者返回 nil 表示无法转换。
+这个函数有一个额外的参数 base 可以来指定参数的进制
 
-●void table.insert(table, [pos,] value)
-在table的数组部分指定位置(pos)插入值为value的一个元素. pos 参数可选, 默认为数组部分末尾
+●string tostring(val)
+这个函数会尝试将 val 转换为字符串
 
-●any table.remove(table, [pos])
-返回table数组部分位于pos位置的元素. 其后的元素会被前移. pos参数可选, 默认为table长度, 即从最后一个元素删起
+●int select(n, ...)
+若 n 為數字則返回 ... 中第 n 個到最後一個
+若 n 為 "#" 則返回 ... 的長度
 
-●void table.unpack(table)
+●void table.insert(T, [N pos,] any value)
+在 T 的数组部分指定位置 pos 插入值为 value 的一个元素， pos 参数可选, 默认为数组部分末尾
 
-●string string.upper(str)
+●any table.remove(T, [N pos])
+返回 T 数组部分位于 pos 位置的元素. 其后的元素会被前移， pos 参数可选, 默认为 T 长度, 即从最后一个元素删起
+
+●void table.unpack(T)
+
+●string string.upper(S)
 字符串全部转为大写字母。
 
-●string string.lower(str)
+●string string.lower(S)
 字符串全部转为小写字母。
 
-●int,int string.match(str, substr[, i])
+●int,int string.match(S str, S substr[, N i])
 在一个指定的目标字符串 str 中搜索指定的内容 substr，
 如果找到了一个匹配的子串，就会返回这个子串，不存在则返回 nil
 i 指定了搜索的起始位置，默认为 1，可以一个负数，表示从后往前数的字符个数
 
-●int,int string.find(str, findstr[, i])
+●int,int string.find(S str, S findstr[, N i])
 在一个指定的目标字符串 str 中搜索指定的内容 findstr，
 如果找到了一个匹配的子串，就会返回这个子串的起始索引和结束索引，不存在则返回 nil
 i 指定了搜索的起始位置，默认为 1，可以一个负数，表示从后往前数的字符个数
 
-●string string.sub(str, i[, j])
+●string string.sub(S str, N i[, N j])
 返回字符串 str 从第 i 个字符到第 j 个字符的子串，参数 i 和参数 j 均可以为负数，
 如果省略参数 j，默认为 -1，也就是子串截止到原串的最后。
 
-●string string.gsub(str, findstr, repstr[, num])
+●string string.gsub(S str, S findstr, S repstr[, N num])
 在字符串 str 中，將 findstr 替换成 repstr，num 為替换次数（可以忽略，则全部替换）
 
 ================Support Function================
-●Table fusf.CutString(String str, String cut, String dis)
-將 str 用 cut 分割成 Table 後傳回, dis 排除
+●Table fusf.CutString(S str, S cut, S from)
+將 str 用 cut 分割成 Table 後傳回, 參數錯誤會傳回 from 錯誤信息
 
-●Table fusf.GetCardTable(Effect|Card|Group c)
+●Table fusf.GetCardTable(E|C|G c)
 將 c 轉換成 Card 組成的 Table 後傳回
 
 ●Bool fusf.NotNil(...)
 確認 val 非 nil ,空字串, 空集合
 
-●Bool fusf.Get_Constant(_constable, _vals)
+●Bool fusf.IsNil(...)
+確認 val 是 nil ,空字串, 空集合
+
+●Bool fusf.Get_Constant(T constable, vals)
 獲取常數性質，用於 fuef:COD 等
 
-●int,int fusf.Get_Loc(S|N loc1, loc2)
+●int,int fusf.Get_Loc(S|N loc1, S|N loc2)
 將 loc 轉換成前後兩個區域後傳回(兩個區域以+分開)
 
-●int fusf.M_chk(int val)
+●int fusf.M_chk(N val)
 傳回 val 不足 20000000 則加上 20000000 
 
-●Table fusf.PostFix_Trans(String str, Table val)
+●Table fusf.PostFix_Trans(S str, ...)
 將 str 轉換成逆波蘭式的 Table 後傳回
 
 ●Bool fusf.IsN(_func)
@@ -78,7 +105,7 @@ i 指定了搜索的起始位置，默认为 1，可以一个负数，表示从�
 ●function fusf.Is_Cons(_func, _key)
 用於 fucf 判斷某常數性質是否為 cons
 
-●function fusf.Get_Func(_c, _func, ...)
+●function fusf.Get_Func(_c, _func, _val)
 用於 fuef 函數註冊
 
 ●Table fusf.Val_Cuts(_val, ...)
@@ -90,6 +117,10 @@ i 指定了搜索的起始位置，默认为 1，可以一个负数，表示从�
 
 ●Table fusf.ForTable(t, n)
 用於 for 會將每個值都輸出(包含 nil
+
+●void fusf.RegFlag(tp_or_c, cod, res, pro[, lab, des])
+为卡片 c 或玩家 tp 注册一个标识用效果
+效果代码为 cod  ，描述为 des ，标签为 lab ，这个效果会在达到 res 时点重置， pro 一般写0即可
 
 ●function fusf.GetFlag(val, cod[, n1, n2])
 傳回 val 上 cod 的數量, 有 n 則傳回比較結果
@@ -146,16 +177,19 @@ nol : 是否忽略检查卡片 c 的苏生限制
 ●Bool fucf.AddCode(c, ...)
 給 c 增加卡名記述 (+20000000)
 
+●Bool fucf.ReviveLimit(c)
+給卡片 c 增加甦生限制, 同 c:EnableReviveLimit()
+
 ●Bool fucf.HasCode(c, cod)
 检查卡片 c 是否是有卡名 cod 记述的卡
 
-●Bool fucf.TgChk(Card c[, Effect e])
+●Bool fucf.TgChk(c[, e])
 检查卡片 c 能否成為 [e 的] 效果對象
 
-●Bool fucf.GChk(Card c)
-检查卡片 c 是否不受到王谷的影響
+●Bool fucf.GChk(c)
+检查卡片 c 是否不受到王谷的影響, 同 not c:IsHasEffect(EFFECT_NECRO_VALLEY) 
 
-●Bool fucf.IsImm(c, Effect e)
+●Bool fucf.IsImm(c, e)
 检查卡片 c 是否免疫效果 e
 
 ●Bool fucf.IsCon(c, p)
@@ -332,24 +366,43 @@ A   --攻击表示
 D   --守备表示
 
 ================Group   Function================
-●Group fugf.Get(int p, Str loc)
+●Group fugf.Get(p, S loc)
 返回以 p 来看的 loc (自己以及對方區域以+分開)位置的卡
 
-●Group fugf.Filter(Group g, Func f[, Any v, int n])
-过滤函数，从卡片组 g 中筛选满足筛选条件 f 的卡， v 為 f 的參數
+●Group fugf.Filter(g, S|F f[, Any v, N n, ...])
+返回卡片组 g 中满足筛选条件 f 的卡， v 為 f 的參數
+若 f 或 v 含有 %i , 則表示為 ... 中的第 i 個
 若有 n 返回 #g >= n
 
-●Group fugf.GetFilter(int p, Str loc, Func f[, Any v, int n])
-过滤函数，以 p 来看的 loc (自己以及對方區域以+分開)位置的卡中筛选满足筛选条件 f 的卡， v 為 f 的參數
+●Group fugf.GetFilter(tp, S loc, S|F f[, Any v, N n, ...])
+返回以 tp 来看的 loc (自己以及對方區域以+分開)位置的卡中满足筛选条件 f 的卡， v 為 f 的參數
+若 f 或 v 含有 %i , 則表示為 ... 中的第 i 個
 若有 n 返回 #g >= n
 
-●Group fugf.SelectFilter(int p, Str loc, Func f[, Any v, int min = 1, int max = min, int sp = p, Card|Group c])
-以 p 来看的 loc (自己以及對方區域以+分開)位置的卡中筛选满足筛选条件 f 并且不等于 c 的卡， v 為 f 的參數
-返回由 sp 從中選擇 min 到 max 數量的卡
+●Group fugf.Select(p, S|G g[, S|F f[, Any v, N min = 1, N max = min, ...])
+若 g 為 S 則卡片組 g 為 fugf.Get(p, g)
+以 tp 来看的 loc (自己以及對方區域以+分開)位置的卡中满足筛选条件 f 的卡， v 為 f 的參數
+若 f 或 v 含有 %i , 則表示為 ... 中的第 i 個
+返回由 tp 從从卡片组 g 中選擇 min 到 max 數量的卡
 
-●Group fugf.SelectTg(int p, Str loc, Func f[, Any v, int min = 1, int max = min, int sp = p, Card|Group c])
-以 p 来看的 loc (自己以及對方區域以+分開)位置的卡中筛选满足筛选条件 f 并且不等于 c 的卡， v 為 f 的參數
-返回由 sp 從中選擇 min 到 max 數量的卡(取對象)
+●Group fugf.Select(p, S|G g[, N min = 1, N max = min])
+若 g 為 S 則卡片組 g 為 fugf.Get(p, g)
+以 tp 来看的 loc (自己以及對方區域以+分開)位置的卡中满足筛选条件 f 的卡， v 為 f 的參數
+若 f 或 v 含有 %i , 則表示為 ... 中的第 i 個
+返回由 tp 從从卡片组 g 中選擇 min 到 max 數量的卡
+
+●Group fugf.SelectTg(p, S|G g[, S|F f[, Any v, N min = 1, N max = min, ...])
+若 g 為 S 則卡片組 g 為 fugf.Get(p, g)
+以 tp 来看的 loc (自己以及對方區域以+分開)位置的卡中满足筛选条件 f 的卡， v 為 f 的參數
+若 f 或 v 含有 %i , 則表示為 ... 中的第 i 個
+返回由 tp 從从卡片组 g 中選擇 min 到 max 數量的卡
+需額外檢測是否能成效果對象
+
+●Group fugf.SelectTg(p, S|G g[, N min = 1, N max = min])
+若 g 為 S 則卡片組 g 為 fugf.Get(p, g)
+以 tp 来看的 loc (自己以及對方區域以+分開)位置的卡中满足筛选条件 f 的卡， v 為 f 的參數
+若 f 或 v 含有 %i , 則表示為 ... 中的第 i 個
+返回由 tp 從从卡片组 g 中選擇 min 到 max 數量的卡
 需額外檢測是否能成效果對象
 
 ================Effect  Function================
@@ -378,8 +431,11 @@ ignore = true 則無視免疫
 同 self:RCreat():SetKey():Reg()
 若為 Noc 函數則返回 self
 
-●fuef fuef.NotNil(from, ...)
-檢測 ... 非全 nil 若 fuef.DebugMode 為 true 則印出錯誤
+●fuef fuef.IsNil(from, ...)
+檢測 ... 為全 nil 若 fuef.DebugMode 為 true 則印出錯誤
+
+●fuef fuef.PreChk(from, ...)
+檢測 ... IsNil 或無 self.e, 若 fuef.DebugMode 為 true 則印出錯誤
 
 ●fuef fuef.I() or (owner[, cod, handler, ignore])
 Ignition
@@ -587,7 +643,7 @@ if v = %1~n then { ... } is value table
 if cant chk then Follow a sequence (val,con,cos,tg,op
 
 ●fuef fuef.RES(_flag, _count)
-a+b/b/b
+a+b/b/b|1
 SELF --自己回合的階段重置
 OPPO --对方回合的階段重置
 CH   --连锁结束重置
@@ -616,7 +672,7 @@ RED  --STD + O + MSC - TF - LEA (EFFECT_LEAVE_FIELD_REDIRECT)
 若有 _ex_op 則執行 _ex_op(c, cm)
 會自動註冊 cm.e1 ~ cm.en 以及 cm.pre.e1 ~ cm.pre.en (庫內預註冊
 
-●fuef fuef.cos_in_tg(e,tp,eg,ep,ev,re,r,rp,chk)
+●fuef fuef.tg_is_cos(e,tp,eg,ep,ev,re,r,rp,chk)
 cost 在 tg 内 (金满类
 	e:SetLabel(100)
 	if chk==0 then return true end
