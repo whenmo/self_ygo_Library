@@ -13,7 +13,7 @@ for i,str in ipairs(fusf.CutString("S,F,E,S+C,F+C,E+C,F+TO,F+TF,S+TO,S+TF,X", "A
 		local name = typ:gsub("+", "")
 		fuef[name] = function(_owner, _cod, _handler, _ignore)
 			if type(_owner) ~= "userdata" then _cod, _owner = _owner end -- _owner is cod (Noc
-			if i == 2 then _cod or "FC" end -- A,QO,QF
+			if i == 2 then _cod = _cod or "FC" end -- A,QO,QF
 			return fuef:Creat(typ, _cod, _owner, _handler, _ignore)
 		end
 	end
