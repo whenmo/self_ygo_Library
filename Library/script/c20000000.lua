@@ -8,8 +8,8 @@ fuef.DebugMode = false
 fuef.I = function(_owner, _handler, _ignore) return fuef:Creat("I", nil, _owner, _handler, _ignore) end
 fuef.FG = function(_owner, _handler, _ignore) return fuef:Creat("F+G", nil, _owner, _handler, _ignore) end
 -- need cod
-for i,str in ipairs(fusf.CutString("S,F,E,S+C,F+C,E+C,F+TO,F+TF,S+TO,S+TF,X", "A,QO,QF", ",", "typ_reg_2")) do
-	for _,typ in ipairs(fusf.CutString(str, ",", "typ_reg_2")) do
+for i,str in ipairs({"S,F,E,S+C,F+C,E+C,F+TO,F+TF,S+TO,S+TF,X", "A,QO,QF"}) do
+	for _,typ in ipairs(fusf.CutString(str, ",", "typ_reg_1")) do
 		local name = typ:gsub("+", "")
 		fuef[name] = function(_owner, _cod, _handler, _ignore)
 			if type(_owner) ~= "userdata" then _cod, _owner = _owner end -- _owner is cod (Noc
