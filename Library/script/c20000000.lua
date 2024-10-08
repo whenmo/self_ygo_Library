@@ -136,7 +136,7 @@ function fuef:RCreat()
 end
 -- Set all Key
 function fuef:SetKey(_from)
-	if fuef.DebugMode then Debug.Message("SetKey <- ".._from) end
+	fuef.Debug("SetKey st <- ".._from)
 	if not self.e then return self end
 	if self.typ then self.e:SetType(self.typ) end
 	if self.cod then self.e:SetCode(self.cod) end
@@ -154,6 +154,7 @@ function fuef:SetKey(_from)
 	if self.res then self.e:SetReset(table.unpack(self.res)) end
 	if self.lab then self.e:SetLabel(table.unpack(self.lab)) end
 	if self.obj then self.e:SetLabelObject(self.obj) end
+	fuef.Debug("SetKey ed <- ".._from)
 	return self
 end
 -- chk is Noc (use in every set key final return without cal need self.e
@@ -163,7 +164,7 @@ function fuef:Reload(_from)
 end
 function fuef.IsNil(from, ...)
 	local res = fusf.IsNil(...)
-	if res and fuef.DebugMode then Debug.Message("... IsNil <- "..from) end
+	if res then fuef.Debug("... IsNil <- ".._from) end
 	return res
 end
 function fuef:PreChk(from, ...)
@@ -171,7 +172,10 @@ function fuef:PreChk(from, ...)
 		self[from:lower()] = {...}
 		return false 
 	end
-	return not fuef.IsNil(from, ...)
+	return not fuef.IsNil("PreChk <- "..from, ...)
+end
+function fuef.Debug(msg)
+	if fuef.DebugMode then Debug.Message(msg) end
 end
 ----------------------------------------------------------------DES
 function fuef:DES(_code, _id) -- (0), ("n"), (m), ("+1")
@@ -243,7 +247,7 @@ end
 function fuef:Func(_val, _func, ...)
 	-- func = ("val,con,cos(v1,v2),tg,op") or ("con(v1,v2),op") or (val, "con,op(v1, v2)"), if v = %1~n then { ... } is value table
 	if fusf.IsNil(_val, _func) then   -- nil chk
-		if fuef.DebugMode then Debug.Message("_val, _func IsNil <- Func"..from) end
+		fuef.Debug("_val, _func IsNil <- Func".._from)
 		return self
 	end
 	local vals = {...}
@@ -285,14 +289,14 @@ function fuef:Func(_val, _func, ...)
 		local val = self.val[1]
 		if type(val) == "string" then
 			self.val = tonumber(val) or fucs.val[val] or fusf.Get_Func(self.e:GetOwner(), table.unpack(self.val))
-			if not self.val and fuef.DebugMode then Debug.Message("val Func value is nil") end
+			if not self.val then fuef.Debug("val Func value is nil") end
 		else	-- number or function
 			self.val = val
 		end
 	end
 	for _,set in ipairs(sets) do
 		local res = fusf.Get_Func(self.e:GetOwner(), table.unpack(self[set]))
-		if not res and fuef.DebugMode then Debug.Message(set.." Func value is nil") end
+		if not res then fuef.Debug(set.." Func value is nil") end
 		self[set] = res
 	end
 	return self:RCreat():SetKey("Func"):Reg()
@@ -301,11 +305,19 @@ function fuef:Func_Model(_key, _func, ...)
 	if not self:PreChk(_key:upper(), _func, ...) then return self end
 	local val_chk = _key == "val" and (tonumber(_func) or fucs.val[_func]) or nil
 	local vals = select("#", ...) > 0 and { ... } or nil
-	if vals and #vals == 1 and type(vals[1]) == "table" then
+	if type(_func) == "string" and _func:match("%(") then 
+		_func = fusf.Val_Cuts(_func, ...)[1]
+		vals = _func
+		if type(_func) == "table" then
+			_func = table.remove(vals,1)
+		else 
+			vals = nil
+		end
+	elseif vals and #vals == 1 and type(vals[1]) == "table" then
 		vals = vals[1]  -- 若 vals 中只有一个表，则直接解包表
 	end
 	self[_key] = val_chk or fusf.Get_Func(self.e:GetOwner(), _func, vals)
-	if not self[_key] and fuef.DebugMode then Debug.Message(_key.." Func value is nil") end
+	if not self[_key] then fuef.Debug(_key.." Func value is nil") end
 	return self:RCreat():SetKey(_key):Reg()
 end
 function fuef:VAL(_func, ...)

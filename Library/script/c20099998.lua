@@ -142,22 +142,24 @@ function fusf.PostFix_Trans(_str, ...)
 end
 function fusf.IsN(_func)
 	return function(_c, _val, _exval)
-		if type(_val) == "string" and _val:match("[%+%-]") then
-			local _, _, val = _str:find("(%d+)")
-			local Cal = {
-				["+"] = Card[_func](_c, _exval) >= math.abs(tonumber(val)),
-				["-"] = Card[_func](_c, _exval) <= math.abs(tonumber(val))
-			}
-			return Cal[_val:match("[%+%-]")]
+		local c_val = Card[_func](_c, _exval)
+		if type(_val) == "string" then
+			local oper, _val = _val:match("([%+%-])(%d+)")
+			_val = tonumber(_val)
+			if oper == "+" then 
+				return c_val >= _val
+			elseif oper == "-" then 
+				return c_val <= _val
+			end
 		end
-		_val = tonumber(_val)
-		if _val > 0 then return Card[_func](_c, _exval) == tonumber(_val) end
-		return Card[_func](_c, _exval) <= tonumber(_val) -- _val = -n
+		if _val > 0 then return c_val == _val end
+		return c_val <= -_val -- _val = -n
 	end
 end
-function fusf.Is_Cons(_func, _key)
+function fusf.Is_Cons(_func, _key, _cal)
+	_cal = _cal or function(card_val, val) return card_val & val == val end
 	return function(c, _cons)
-		if type(_cons) ~= "string" then return Card[_func](c) & _cons == _cons end
+		if type(_cons) ~= "string" then return _cal(Card[_func](c), _cons) end
 		local res, valL, valR = { }
 		for _, val in ipairs(fusf.PostFix_Trans(_cons)) do
 			if val:match("[%-%~]") then
@@ -171,8 +173,7 @@ function fusf.Is_Cons(_func, _key)
 				}
 				table.insert(res, Cal[val])
 			else
-				_cons = fucs[_key][val:upper()]
-				table.insert(res, Card[_func](c) & _cons == _cons)
+				table.insert(res, _cal(Card[_func](c), fucs[_key][val:upper()]))
 			end
 		end
 		return res[#res]
