@@ -31,7 +31,7 @@ function fu_HC.T_tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return g:IsContains(chkc) end
 	if chk==0 then return #g>0 and e:GetHandler():IsSSetable() end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	fugf.SelectTg(tp,"S","IsPos+IsSeq+TgChk",{"FD,-4",e})
+	fugf.SelectTg(tp,g)
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
 end
 function fu_HC.T_op1(e,tp,eg,ep,ev,re,r,rp)
@@ -51,14 +51,14 @@ end
 function fu_HC.M_initial(_glo)
 	local cm, m = fuef.initial(fu_HC, _glo, fu_HC.glo)
 	cm.e1 = fuef.QO():CAT("SP"):RAN("HG"):CTL(m):Func("M_cos1,M_tg1,op1")
-	cm.pre.e2 = fuef.F(m):PRO("PTG"):RAN("M"):TRAN("1+0")
-	cm.pre.e3 = fuef.FC("CH"):RAN("M"):Func("M_con3,M_op3")
+	cm.pre.e1 = fuef.F(m):PRO("PTG"):RAN("M"):TRAN("1+0")
+	cm.pre.e2 = fuef.FC("CH"):RAN("M"):Func("M_con3,M_op3")
 	return cm, m
 end
 function fu_HC.M_cos1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return fugf.GetFilter(tp,"M","IsPos+IsSet+IsTyp+AbleTo+IsLv","FU,5fd1,M,*G,+"..e:GetHandler():GetOriginalLevel(),1) end
-	g = fugf.SelectFilter(tp,"M","IsPos+IsSet+IsTyp+AbleTo+IsLv","FU,5fd1,M,*G,+"..e:GetHandler():GetOriginalLevel())
-	Duel.SendtoGrave(g,REASON_COST)
+	local g = fugf.GetFilter(tp,"M","IsPos+IsSet+IsTyp+AbleTo+IsLv","FU,5fd1,M,*G,+"..e:GetHandler():GetOriginalLevel())
+	if chk==0 then return #g>0 end
+	Duel.SendtoGrave(fugf.Select(tp,g),REASON_COST)
 end
 function fu_HC.M_tg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
@@ -68,8 +68,9 @@ function fu_HC.M_con3(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP)
 end
 function fu_HC.M_op3(e,tp,eg,ep,ev,re,r,rp)
-	fuef.S(e,EFFECT_UPDATE_LEVEL):PRO("SR"):RAN("M"):VAL(1):RES("EV+STD+DIS")
+	fuef.S(e,EFFECT_UPDATE_LEVEL):PRO("SR"):RAN("M"):VAL(1):RES("STD+DIS")
 	Duel.Damage(1-tp,e:GetHandler():GetLevel()*100,REASON_EFFECT)
+	Duel.Readjust()
 end
 if self_code ~= 20000175 then return end
 --------------------------------------------------------
@@ -83,7 +84,7 @@ function cm.con1(e,tp,eg,ep,ev,re,r,rp)
 			g = g + tc:GetColumnGroup()
 		end
 	end
-	return Duel.GetAttackTarget() and g:IsContains(Duel.GetAttackTarget()) or g:IsContains(Duel.GetAttacker())
+	return g:IsContains(Duel.GetAttacker()) or (Duel.GetAttackTarget() and g:IsContains(Duel.GetAttackTarget()))
 end
 function cm.cos1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g = Group.FromCards(Duel.GetAttacker())
@@ -92,7 +93,7 @@ function cm.cos1(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	if chk==0 then return fugf.Filter(g,"AbleTo","*R",1) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	if #g ~= 1 then g = g:Select() end
+	if #g ~= 1 then g = fugf.Select(tp,g) end
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function cm.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -101,7 +102,7 @@ function cm.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g = fugf.SelectFilter(tp,"D","AbleTo+IsSet","G,5fd1")
+	local g = fugf.Select(tp,"D","AbleTo+IsSet","G,5fd1")
 	if #g>0 then
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end

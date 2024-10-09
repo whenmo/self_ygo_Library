@@ -9,5 +9,5 @@ function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 	if #g==0 or Duel.GetLocationCount(tp,LOCATION_MZONE)==0 or not Duel.SelectYesNo(tp,1152) then return end
 	Duel.BreakEffect()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
+	Duel.SpecialSummon(fugf.Select(tp,g),0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 end

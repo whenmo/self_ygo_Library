@@ -8,7 +8,7 @@ function cm.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 	if #fugf.Get(tp,"D")==0 then return end
-	local n = (cm.chk[tp+1]+3 > #fugf.Get(tp,"D")) and #fugf.Get(tp,"D") or (cm.chk[tp+1]+3)
+	local n = math.min(cm.chk[tp+1]+2, #fugf.Get(tp,"D"))
 	Duel.ConfirmDecktop(tp,n)
 	local g=fugf.Filter(Duel.GetDecktopGroup(tp,n),"IsTyp+IsSSetable","T")
 	if #g>0 and Duel.SelectYesNo(tp,1153) then

@@ -5,7 +5,7 @@ local cm, m = fu_HC.M_initial()
 cm.e1 = fuef.QO():CAT("SP"):RAN("HG"):CTL(m):Func("cos1,M_tg1,op1")
 function cm.cos1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return fugf.GetFilter(tp,"MS","IsTyp+AbleTo","T,*G",1) end
-	local tc = fugf.SelectFilter(tp,"MS","IsTyp+AbleTo","T,*G"):GetFirst()
+	local tc = fugf.Select(tp,"MS","IsTyp+AbleTo","T,*G"):GetFirst()
 	if tc:IsFacedown() then Duel.ConfirmCards(1-tp,tc) end
 	Duel.SendtoGrave(tc,REASON_COST)
 end
