@@ -23,7 +23,7 @@ end
 -------------------
 function fu_HC.T_initial(_glo)
 	local cm, m = fuef.initial(fu_HC, _glo, fu_HC.glo)
-	cm.pre.e1 = fuef.QO():PRO("TG"):RAN("G"):CTL(m):Func("exccon,T_tg1,T_op1")
+	cm.pe1 = fuef.QO():PRO("TG"):RAN("G"):CTL(m):Func("exccon,T_tg1,T_op1")
 	return cm, m
 end
 function fu_HC.T_tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -51,8 +51,8 @@ end
 function fu_HC.M_initial(_glo)
 	local cm, m = fuef.initial(fu_HC, _glo, fu_HC.glo)
 	cm.e1 = fuef.QO():CAT("SP"):RAN("HG"):CTL(m):Func("M_cos1,M_tg1,op1")
-	cm.pre.e1 = fuef.F(m):PRO("PTG"):RAN("M"):TRAN("1+0")
-	cm.pre.e2 = fuef.FC("CH"):RAN("M"):Func("M_con3,M_op3")
+	cm.pe1 = fuef.F(m):PRO("PTG"):RAN("M"):TRAN("1+0")
+	cm.pe2 = fuef.FC("CH"):RAN("M"):Func("M_con3,M_op3")
 	return cm, m
 end
 function fu_HC.M_cos1(e,tp,eg,ep,ev,re,r,rp,chk)
