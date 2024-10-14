@@ -1,3 +1,0 @@
-#小壶 1701585682 200 0xfd0-0xfdf
-!setname  0xbfd4 创导龙裔
-!setname  0x3fd4 创导龙
