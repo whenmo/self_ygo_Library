@@ -1,4 +1,4 @@
-require("expansions/script/c20099998")
+dofile("expansions/script/c20099998.lua")
 if fucf then return end
 fucf, fugf = { }, { }
 -------------------------------------- Group function
@@ -183,5 +183,5 @@ fucf.IsSTyp = fusf.Is_Cons("GetSummonType", "styp")
 fucf.IsOTyp = fusf.Is_Cons("GetOriginalType", "typ")
 fucf.IsAtt  = fusf.Is_Cons("GetAttribute", "att")
 fucf.IsRac  = fusf.Is_Cons("GetRace", "rac")
-fucf.IsPos  = fusf.Is_Cons("GetPosition", "pos")
-fucf.IsPPos = fusf.Is_Cons("GetPreviousPosition", "pos")
+fucf.IsPos  = fusf.Is_Cons("GetPosition", "pos", function(card_val, val) return card_val | val == val end)
+fucf.IsPPos = fusf.Is_Cons("GetPreviousPosition", "pos", function(card_val, val) return card_val | val == val end)

@@ -1,5 +1,5 @@
 --圣沌忍者 曼怛罗
-require("expansions/script/c20000175")
+dofile("expansions/script/c20000175.lua")
 local cm, m = fu_HC.M_initial()
 --e1
 cm.e1 = fuef.QO():CAT("SP"):RAN("HG"):CTL(m):Func("cos1,M_tg1,op1")

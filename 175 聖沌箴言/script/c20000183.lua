@@ -1,5 +1,5 @@
 --圣沌忍法 后门
-require("expansions/script/c20000175")
+dofile("expansions/script/c20000175.lua")
 local cm, m =  fuef.initial(fu_HC, nil, fu_HC.glo)
 cm.e1 = fuef.A()
 --e2

@@ -1,5 +1,5 @@
 --创导龙裔的转生
-require("expansions/script/c20000450")
+dofile("expansions/script/c20000450.lua")
 local cm, m = fu_GD.RS_initial("IsTyp+IsRac","M,SP")
 cm.e1 = fuef.A():CAT("SP"):Func("tg1,op1")
 --e1

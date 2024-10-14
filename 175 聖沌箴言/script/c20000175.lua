@@ -1,5 +1,5 @@
 --忍之箴言
-require("expansions/script/c20000000")
+dofile("expansions/script/c20000000.lua")
 fu_HC = fu_HC or {}
 -------------------
 function fu_HC.glo(c)

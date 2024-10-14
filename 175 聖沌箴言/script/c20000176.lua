@@ -1,5 +1,5 @@
 --忍瞬之圣沌 千手
-require("expansions/script/c20000175")
+dofile("expansions/script/c20000175.lua")
 local cm, m = fu_HC.T_initial()
 --e1
 cm.e1 = fuef.A():CAT("SP"):Func("tg1,op1")

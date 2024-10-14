@@ -1,6 +1,7 @@
 --威天之创导龙
-require("expansions/script/c20000450")
+dofile("expansions/script/c20000450.lua")
 local cm, m = fu_GD.RM_initial()
+--e1
 cm.e1 = fuef.FTO("DR"):PRO("DE+TG"):RAN("M"):CTL(1):Func("sd_con,tg1,op1")
 function cm.tg1f(g)
 	return function(e,ep,tp)
@@ -11,11 +12,12 @@ function cm.tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) end
 	if chk==0 then return fugf.GetFilter(tp,"+MS","TgChk",e,1) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SetChainLimit(cm.tg1f(fugf.SelectTg(tp,"+MS","TgChk",e)))
+	local g = fugf.SelectTg(tp,"+MS","TgChk",e,1,ev)
+	Duel.SetChainLimit(cm.tg1f(g))
 end
 function cm.op1con1(e)
-	local tp=e:GetHandlerPlayer()
-	return not e:GetHandler():IsStatus(STATUS_EFFECT_ENABLED) and not fugf.GetFilter(tp,"M","IsTyp+IsRac+IsPos","RI+M,DR,FU",1)
+	local tp = e:GetOwnerPlayer()
+	return e:GetHandler():IsStatus(STATUS_EFFECT_ENABLED) and fugf.GetFilter(tp,"M","IsTyp+IsRac+IsPos","RI+M,DR,FU",1)
 end
 function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 	local g = Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)

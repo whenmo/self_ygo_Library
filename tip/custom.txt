@@ -421,21 +421,21 @@ fuef:Reg(true) 等同 fuef:Reg(nil, true)
 handler = false 則不註冊 (用於天氣類效果
 ignore = true 則無視免疫
 
-●fuef fuef.RCreat()
-重置 fuef 並以 fuef 的 owner 再創建一個效果
-
 ●fuef fuef.SetKey()
 設置 fuef.e 的屬性(不包含注册)
 
-●fuef fuef.Reload()
-同 self:RCreat():SetKey():Reg()
-若為 Noc 函數則返回 self
+●fuef fuef.Reload(S from)
+重置 fuef 並以 fuef 的 owner 再創建一個效果
+而後返回 self:SetKey(S from):Reg()
 
 ●fuef fuef.IsNil(from, ...)
 檢測 ... 為全 nil 若 fuef.DebugMode 為 true 則印出錯誤
 
 ●fuef fuef.PreChk(from, ...)
 檢測 ... IsNil 或無 self.e, 若 fuef.DebugMode 為 true 則印出錯誤
+
+●fuef fuef.Debug(S msg)
+若處於調適模式( fuef.DebugMode = true )則印出 msg
 
 ●fuef fuef.I() or (owner[, cod, handler, ignore])
 Ignition

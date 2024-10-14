@@ -1,5 +1,5 @@
 --曜日之创导龙
-require("expansions/script/c20000450")
+dofile("expansions/script/c20000450.lua")
 local cm, m = fu_GD.RM_initial()
 cm.e1 = fuef.FTO("DR"):CAT("RE"):PRO("DE"):RAN("M"):CTL(1):Func("sd_con,tg1,op1")
 function cm.tg1(e,tp,eg,ep,ev,re,r,rp,chk)

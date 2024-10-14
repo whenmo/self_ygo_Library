@@ -1,5 +1,5 @@
 --圣沌大忍者 波罗羯谛
-require("expansions/script/c20000175")
+dofile("expansions/script/c20000175.lua")
 local cm, m = fu_HC.M_initial()
 --e1
 function cm.op1(e,tp,eg,ep,ev,re,r,rp)

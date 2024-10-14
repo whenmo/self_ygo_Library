@@ -1,4 +1,4 @@
-require("expansions/script/c20099998")
+dofile("expansions/script/c20099998.lua")
 if fucf then return end
 fucf, fugf = { }, { }
 -------------------------------------- Group function

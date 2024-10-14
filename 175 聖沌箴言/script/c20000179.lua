@@ -1,5 +1,5 @@
 --忍防之圣沌 八方
-require("expansions/script/c20000175")
+dofile("expansions/script/c20000175.lua")
 local cm, m = fu_HC.T_initial()
 --e1
 cm.e1 = fuef.A():OP("op1")

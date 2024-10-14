@@ -1,8 +1,7 @@
-require("expansions/script/c20099997")
+dofile("expansions/script/c20099997.lua")
 if fuef then return end
-fuef = { } --2024/10/7
+fuef = { DebugMode = false } --2024/10/14
 fuef.__index = fuef 
-fuef.DebugMode = false
 ---------------------------------------------------------------- Standard Register
 -- no cod 
 fuef.I = function(_owner, _handler, _ignore) return fuef:Creat("I", nil, _owner, _handler, _ignore) end
@@ -21,28 +20,10 @@ end
 ---------------------------------------------------------------- fuef()
 function fuef:__call(_cod, _handler, _ignore)
 	-- _cod is owner (Creat and Register Noc
-	if type(_cod) == "userdata" then
-		local ori = self
-		while ori.pre do
-			ori = ori.pre
-		end
-		repeat
-			self = fuef:Creat(ori.typ, ori.cod, _cod, _handler, _ignore)
-			for _,_key in ipairs(fusf.CutString("cat,pro,ran,tran,res,lab,obj", ",", "__call_1")) do
-				self[_key] = ori[_key] or nil
-			end
-			self:RCreat():SetKey("call Reg Noc"):Reg()
-			for _,_key in ipairs(fusf.CutString("des,ctl,val,con,cos,tg,op", ",", "__call_2")) do
-				if ori[_key] then fuef[_key:upper()](self, table.unpack(ori[_key])) end
-			end
-			local chk = ori.aft
-			if chk then ori = ori.aft end
-		until not chk
-		return self
-	end
+	if type(_cod) == "userdata" then return self:CreatNoc(_cod, _handler, _ignore) end
 	-- Creat and Clone all key
 	local CE = setmetatable({ }, fuef)
-	for _,_key in ipairs(fusf.CutString("typ,cod,des,cat,pro,ran,tran,ctl,val,con,cos,tg,op,res,lab,obj,handler", ",", "__call_3")) do
+	for _,_key in ipairs(fusf.CutString("typ,cod,des,cat,pro,ran,tran,ctl,val,con,cos,tg,op,res,lab,obj,handler", ",", "__call")) do
 		CE[_key] = self[_key] or nil
 	end
 	if _cod then CE.cod = fusf.Get_Constant("cod", _cod) end
@@ -73,6 +54,21 @@ function fuef:Creat(_typ, _cod, _owner, _handler, _ignore)
 	if _cod then E.e:SetCode(E.cod) end
 	-- Register Effect
 	return E:Reg(_handler, _ignore)
+end
+function fuef:CreatNoc(_owner, _handler, _ignore)
+	local ori = self
+	while ori.pre do
+		ori = ori.pre
+	end
+	repeat
+		self = fuef:Creat(ori.typ, ori.cod, _owner, _handler, _ignore)
+		for _,_key in ipairs(fusf.CutString("des,cat,pro,ran,tran,ctl,val,con,cos,tg,op,res,lab,obj", ",", "CreatNoc")) do
+			if ori[_key] then fuef[_key:upper()](self, table.unpack(ori[_key])) end
+		end
+		local chk = ori.aft
+		if chk then ori = ori.aft end
+	until not chk
+	return self
 end
 -- Register Effect
 function fuef:Reg(_handler, _ignore)
@@ -117,27 +113,9 @@ function fuef:Reg(_handler, _ignore)
 	end
 	return self
 end
--- Reset and Creat Effect
-function fuef:RCreat()
-	-- chk self.e is effect
-	if not aux.GetValueType(self.e) == "Effect" then return self end
-	-- Reset self
-	local _owner = self.e:GetOwner()
-	self.e:Reset()
-	self.e = Effect.CreateEffect(_owner)
-	-- Reset if handler is group
-	if self.gclo then 
-		for _, gcloe in ipairs(self.gclo) do
-			gcloe:Reset()
-		end
-		self.gclo = nil
-	end
-	return self
-end
 -- Set all Key
 function fuef:SetKey(_from)
-	if fuef.DebugMode then Debug.Message("SetKey <- ".._from) end
-	if not self.e then return self end
+	self:Debug("SetKey st <- ".._from)
 	if self.typ then self.e:SetType(self.typ) end
 	if self.cod then self.e:SetCode(self.cod) end
 	if self.des then self.e:SetDescription(self.des) end
@@ -154,16 +132,29 @@ function fuef:SetKey(_from)
 	if self.res then self.e:SetReset(table.unpack(self.res)) end
 	if self.lab then self.e:SetLabel(table.unpack(self.lab)) end
 	if self.obj then self.e:SetLabelObject(self.obj) end
+	self:Debug("")
 	return self
 end
--- chk is Noc (use in every set key final return without cal need self.e
+-- Reset and Creat Effect and SetKey and Reg (use in every set key final return
 function fuef:Reload(_from)
-	if not self.e then return self end
-	return self:RCreat():SetKey("Reload <- ".._from):Reg()
+	-- chk self.e is effect
+	if not aux.GetValueType(self.e) == "Effect" then return self:Debug("self.e is not Effect <- Reload <- ".._from) end
+	-- Reset self
+	local _owner = self.e:GetOwner()
+	self.e:Reset()
+	self.e = Effect.CreateEffect(_owner)
+	-- Reset if handler is group
+	if self.gclo then 
+		for _, gcloe in ipairs(self.gclo) do
+			gcloe:Reset()
+		end
+		self.gclo = nil
+	end
+	return self:SetKey("Reload <- ".._from):Reg()
 end
-function fuef.IsNil(from, ...)
+function fuef:IsNil(from, ...)
 	local res = fusf.IsNil(...)
-	if res and fuef.DebugMode then Debug.Message("... IsNil <- "..from) end
+	if res then self:Debug("... IsNil <- ".._from) end
 	return res
 end
 function fuef:PreChk(from, ...)
@@ -171,22 +162,26 @@ function fuef:PreChk(from, ...)
 		self[from:lower()] = {...}
 		return false 
 	end
-	return not fuef.IsNil(from, ...)
+	return not self:IsNil("PreChk <- "..from, ...)
+end
+function fuef:Debug(msg)
+	if fuef.DebugMode then Debug.Message(msg) end
+	return self
 end
 ----------------------------------------------------------------DES
 function fuef:DES(_code, _id) -- (0), ("n"), (m), ("+1")
 	if not self:PreChk("DES", _code, _id) then return self end
 	self.des = fusf.GetDES(_code, _id, self.e:GetOwner():GetOriginalCode())
-	return self:RCreat():SetKey("DES"):Reg()
+	return self:Reload("DES")
 end
 ----------------------------------------------------------------TYP, COD, CAT and PRO
 function fuef:Cons_Model(_key, _val)
-	if fuef.IsNil(_key:upper(), _val) then return self end  -- nil chk
+	if not self:PreChk(_key:upper(), _val) then return self end
 	local _keytype = _key == "typ" and "etyp" or _key
 	local val, des = fusf.Get_Constant(_keytype, _val)
 	self[_key] = val
 	if _key == "cod" and not self.des and fucs.des[des] then self.des = fucs.des[des] end
-	return self:Reload("Cons_Model")
+	return self:Reload("Cons_Model <- ".._key:upper())
 end
 function fuef:TYP(_val)
 	return self:Cons_Model("typ", _val)
@@ -202,12 +197,12 @@ function fuef:PRO(_val)
 end
 ----------------------------------------------------------------RAN and TRAN
 function fuef:RAN(_loc)
-	if fuef.IsNil("RAN", _loc) then return self end  -- nil chk
+	if not self:PreChk("RAN", _loc) then return self end
 	self.ran = fusf.Get_Loc(_loc, nil, "fuef:RAN()")
 	return self:Reload("RAN")
 end
 function fuef:TRAN(_loc1, _loc2)
-	if fuef.IsNil("TRAN", _loc1, _loc2) then return self end  -- nil chk
+	if not self:PreChk("TRAN", _loc1, _loc2) then return self end
 	self.tran = {fusf.Get_Loc(_loc1, _loc2, "fuef:TRAN()")}
 	return self:Reload("TRAN")
 end
@@ -217,13 +212,13 @@ function fuef:CTL(_count, _code, _pro) --count, code, pro
 	if type(_count) == "string" or _count > 99 then -- ("n+D") or (m) -> (1, "n+D") or (1, m)
 		_count, _code, _pro = 1, _count, _code 
 	end
-	local res, ctl_val = {0, 0}, {
+	local res, ctl_val = {_code or 0, _pro or 0}, {
 		O = EFFECT_COUNT_CODE_OATH,
 		D = EFFECT_COUNT_CODE_DUEL,
 		C = EFFECT_COUNT_CODE_CHAIN,
 	}
 	if _pro then -- (1, n, "D")
-		res[1] = fusf.M_chk(_code) + ctl_val[_pro:match("[ODC]")]
+		res = {fusf.M_chk(_code), ctl_val[_pro:match("[ODC]")]}
 	elseif type(_code) == "string" then -- (1, "n+D")
 		res = fusf.CutString(_code, "+", "CTL_1") -- (n), (n, d), (d)
 		if res[1]:match("[ODC]") then
@@ -237,13 +232,13 @@ function fuef:CTL(_count, _code, _pro) --count, code, pro
 		if res[2] & 0x30000000 > 0 and res[1] == 0 then res[1] = self.e:GetOwner():GetOriginalCode() end -- is O or D
 	end
 	self.ctl = {_count, res[1] + res[2]}
-	return self:RCreat():SetKey("CTL"):Reg()
+	return self:Reload("CTL")
 end
 ----------------------------------------------------------------VAL, CON, COS, TG and OP
 function fuef:Func(_val, _func, ...)
 	-- func = ("val,con,cos(v1,v2),tg,op") or ("con(v1,v2),op") or (val, "con,op(v1, v2)"), if v = %1~n then { ... } is value table
 	if fusf.IsNil(_val, _func) then   -- nil chk
-		if fuef.DebugMode then Debug.Message("_val, _func IsNil <- Func"..from) end
+		self:Debug("_val, _func IsNil <- Func".._from)
 		return self
 	end
 	local vals = {...}
@@ -285,28 +280,36 @@ function fuef:Func(_val, _func, ...)
 		local val = self.val[1]
 		if type(val) == "string" then
 			self.val = tonumber(val) or fucs.val[val] or fusf.Get_Func(self.e:GetOwner(), table.unpack(self.val))
-			if not self.val and fuef.DebugMode then Debug.Message("val Func value is nil") end
+			if not self.val then self:Debug("val Func value is nil") end
 		else	-- number or function
 			self.val = val
 		end
 	end
 	for _,set in ipairs(sets) do
 		local res = fusf.Get_Func(self.e:GetOwner(), table.unpack(self[set]))
-		if not res and fuef.DebugMode then Debug.Message(set.." Func value is nil") end
+		if not res then self:Debug(set.." Func value is nil") end
 		self[set] = res
 	end
-	return self:RCreat():SetKey("Func"):Reg()
+	return self:Reload("Func")
 end
 function fuef:Func_Model(_key, _func, ...)
 	if not self:PreChk(_key:upper(), _func, ...) then return self end
 	local val_chk = _key == "val" and (tonumber(_func) or fucs.val[_func]) or nil
 	local vals = select("#", ...) > 0 and { ... } or nil
-	if vals and #vals == 1 and type(vals[1]) == "table" then
+	if type(_func) == "string" and _func:match("%(") then 
+		_func = fusf.Val_Cuts(_func, ...)[1]
+		vals = _func
+		if type(_func) == "table" then
+			_func = table.remove(vals,1)
+		else 
+			vals = nil
+		end
+	elseif vals and #vals == 1 and type(vals[1]) == "table" then
 		vals = vals[1]  -- 若 vals 中只有一个表，则直接解包表
 	end
 	self[_key] = val_chk or fusf.Get_Func(self.e:GetOwner(), _func, vals)
-	if not self[_key] and fuef.DebugMode then Debug.Message(_key.." Func value is nil") end
-	return self:RCreat():SetKey(_key):Reg()
+	if not self[_key] then self:Debug(_key.." Func value is nil") end
+	return self:Reload("Func_Model <- ".._key:upper())
 end
 function fuef:VAL(_func, ...)
 	return self:Func_Model("val", _func, ...)
@@ -325,13 +328,13 @@ function fuef:OP(_func, ...)
 end
 ----------------------------------------------------------------RES
 function fuef:RES(_flag, _count)	-- _flag = a + b/b1/b2 + c | 1
-	if fuef.IsNil("RES", _flag, _count) then return self end  -- nil chk
+	if not self:PreChk("RES", _flag, _count) then return self end
 	self.res = fusf.GetRES(_flag, _count)
 	return self:Reload("RES")
 end
 ----------------------------------------------------------------LAB
 function fuef:LAB(...)
-	if fuef.IsNil("LAB", ...) then return self end  -- nil chk
+	if not self:PreChk("LAB", ...) then return self end
 	local _labs = {...}
 	local labs = { }
 	for _,_lab in ipairs(_labs) do
@@ -348,7 +351,7 @@ function fuef:LAB(...)
 end
 ----------------------------------------------------------------OBJ
 function fuef:OBJ(_val)
-	if fuef.IsNil("OBJ", _val) then return self end  -- nil chk
+	if not self:PreChk("OBJ", _val) then return self end
 	self.obj = _val
 	return self:Reload("OBJ")
 end
@@ -356,9 +359,8 @@ end
 function fuef.initial(_lib, _glo, _exop_func, ...)
 	local cm, m = GetID()
 	local exop_val = { ... }
-	cm.pre = {}
-	cm.initial_effect = function(c)
-		if _lib then cm.lib = _lib end  -- set lib
+	cm.es, cm.lib = {}, _lib
+	cm.initial_effect = cm.initial_effect or function(c)
 		-- do ex_op
 		if _exop_func then 
 			local place = 1
@@ -375,19 +377,19 @@ function fuef.initial(_lib, _glo, _exop_func, ...)
 				end
 			end
 		end
-		local dof = function(_tab, _name, _exval)
+		local dof = function(_name, _exval)
 			local n = 1
-			while _tab[_name..n] do
-				_tab[_name..n](c, _exval)
+			while cm[_name..n] do
+				cm.es[_name..n] = cm[_name..n](c, _exval)
 				n = n + 1
 			end
 		end
-		dof(cm, "e")		-- do e1 ~ en
-		dof(cm.pre, "e")	-- do e1 ~ en in lib pre set
+		dof("e")	-- do e1 ~ en
+		dof("pe")   -- do e1 ~ en in lib pre set
 		-- if cm[_glo] then do ge1 ~ gen
 		if not (_glo and not cm[_glo]) then return end
 		cm[_glo] = {0, 0}
-		dof(cm, "ge", 1)
+		dof("ge", 1)
 	end
 	return cm, m
 end

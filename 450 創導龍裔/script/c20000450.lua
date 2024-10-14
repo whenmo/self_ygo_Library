@@ -1,5 +1,5 @@
 --创导龙裔·觉醒者
-require("expansions/script/c20000000")
+dofile("expansions/script/c20000000.lua")
 fu_GD = fu_GD or { }
 --self_draw_con
 function fu_GD.sd_con(e,tp,eg,ep,ev,re,r,rp)
@@ -9,11 +9,9 @@ end
 function fu_GD.N_initial(add_cat, f1_loc, f1_func, f1_val)
 	local cm, m = fuef.initial(fu_GD, _glo)
 	local func = function(e,tp) return fugf.GetFilter(tp, f1_loc, f1_func, f1_val) end
-	cm.pre.e1 = fuef.I():CAT("TD+DR"..(add_cat and "+"..add_cat or "")):RAN("H"):CTL(m):Func("N_cos1,N_tg1(%1),N_op1(%1)", func)
-	cm.pre.e2 = fuef.FC("DR"):RAN("H"):Func("sd_con,N_op2")
+	cm.pe1 = fuef.I():CAT("TD+DR"..(add_cat and "+"..add_cat or "")):RAN("H"):CTL(m):Func("N_cos1,N_tg1(%1),N_op1(%1)", func)
+	cm.pe2 = fuef.FC("DR"):RAN("H"):Func("sd_con,N_op2")
 	return cm, m
-end
-function fu_GD.t_op(e,tp,eg,ep,ev,re,r,rp)
 end
 function fu_GD.N_cos1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsPublic() end
@@ -70,7 +68,7 @@ end
 function fu_GD.RS_initial(f1_func, f1_val)
 	local cm, m = fuef.initial(fu_GD)
 	local func = function(e,tp) return fugf.GetFilter(tp, "G", f1_func, f1_val) end
-	cm.pre.e1 = fuef.FTO("LEA"):CAT("TD+DR+GA"):PRO("DE"):RAN("G"):CTL(m):Func("RS_con1,N_tg1(%1),N_op1(%1)", func)
+	cm.pe1 = fuef.FTO("LEA"):CAT("TD+DR+GA"):PRO("DE"):RAN("G"):CTL(m):Func("RS_con1,N_tg1(%1),N_op1(%1)", func)
 	return cm, m
 end
 function fu_GD.RS_con1(e,tp,eg,ep,ev,re,r,rp)
@@ -79,10 +77,10 @@ end
 -- ritual monster initial
 function fu_GD.RM_initial(_glo)
 	local cm, m = fuef.initial(fu_GD, _glo, "AddCode,ReviveLimit", 455)
-	cm.pre.e1 = fuef.F(m):PRO("PTG"):RAN("M"):TRAN(1,0):CON("RM_con1")
+	cm.pe1 = fuef.F(m):PRO("PTG"):RAN("M"):TRAN(1,0):CON("RM_con1")
 	return cm, m
 end
-function fu_GD.RM_con1(e,tp,eg,ep,ev,re,r,rp)
+function fu_GD.RM_con1(e)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL)
 end
 if self_code ~= 20000450 then return end

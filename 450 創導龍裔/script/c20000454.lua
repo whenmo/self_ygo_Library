@@ -1,5 +1,5 @@
 --创导龙裔的秘仪
-require("expansions/script/c20000450")
+dofile("expansions/script/c20000450.lua")
 local cm, m = fu_GD.RS_initial("IsTyp","RI+S")
 cm.e1 = fuef.A():CAT("SP"):Func("tg_is_cos,tg1,op1")
 --e1

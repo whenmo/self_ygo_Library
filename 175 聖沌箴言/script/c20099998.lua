@@ -1,4 +1,4 @@
-require("expansions/script/c20099999")
+dofile("expansions/script/c20099999.lua")
 if fusf then return end
 fusf = { }
 --------------------------------------"Support function"

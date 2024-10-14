@@ -1,5 +1,5 @@
 --击星之创导龙
-require("expansions/script/c20000450")
+dofile("expansions/script/c20000450.lua")
 local cm, m = fu_GD.RM_initial("glo")
 cm.e1 = fuef.S(EFFECT_EXTRA_ATTACK):RAN("M"):VAL("val1")
 cm.val1 = function(e) return cm.glo[e:GetHandlerPlayer() + 1] + 1 end

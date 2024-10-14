@@ -1,5 +1,5 @@
 --创导龙裔的煉成
-require("expansions/script/c20000450")
+dofile("expansions/script/c20000450.lua")
 local cm, m = fuef.initial(fu_GD)
 --e1
 cm.e1 = fuef.A()
