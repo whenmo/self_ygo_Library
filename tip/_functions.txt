@@ -3821,6 +3821,12 @@ CARDDATA_LINK_MARKER	12
 
 ●void table.unpack(T)
 
+●Table string.Cut(S str, S from, S cut)
+將 str 用 cut 分割成 Table 後傳回, 參數錯誤會傳回 from 錯誤信息
+
+●function string.ForCut(S str, S from, S cut)
+用於 for ind, str in string:ForCut() do
+
 ●string string.upper(S)
 字符串全部转为大写字母。
 
@@ -3845,11 +3851,29 @@ i 指定了搜索的起始位置，默认为 1，可以一个负数，表示从�
 在字符串 str 中，將 findstr 替换成 repstr，num 為替换次数（可以忽略，则全部替换）
 
 ================Support Function================
-●Table fusf.CutString(S str, S cut, S from)
-將 str 用 cut 分割成 Table 後傳回, 參數錯誤會傳回 from 錯誤信息
+●void fusf.Debug(msg)
+若處於調適模式( fuef.DebugMode = true )則印出 msg
 
-●Table fusf.GetCardTable(E|C|G c)
-將 c 轉換成 Card 組成的 Table 後傳回
+●String fusf.ValToDebug(...)
+把參數轉換成打印 msg
+
+●Table fusf.Getcm(E|C|G|fuef val)
+傳回 cm
+
+●String fusf.CutHex(n)
+转换 typ 等并分割
+
+●Card fusf.ToCard(E|C|G val[, is_owner = false])
+將 val 轉換成 Card 後傳回
+is_owner 則 Effect:GetOwner()
+否則 Effect:GetHandler()
+無法變 Card 則傳回 false
+
+●Group fusf.ToGroup(E|C|G val[, is_owner = false])
+將 val 轉換成 Group 後傳回
+is_owner 則 Effect:GetOwner()
+否則 Effect:GetHandler()
+無法變 Group 則傳回 false
 
 ●Bool fusf.NotNil(...)
 確認 val 非 nil ,空字串, 空集合
@@ -3888,6 +3912,15 @@ i 指定了搜索的起始位置，默认为 1，可以一个负数，表示从�
 ●Table fusf.ForTable(t, n)
 用於 for 會將每個值都輸出(包含 nil
 
+●function fusf.Creat_CF(S|F _func, T _val[, ...])
+創建一個傳入 Card 會傳回 bool 返回值类型的函數
+傳回值為判斷 Card 是否滿足過濾條件 _func ,  _val 為 _func 的參數
+
+●function fusf.Creat_GF(S|F _func, T _val[, ...])
+創建一個傳入 Group 會傳回 Group 返回值类型的函數
+傳回值為 Group 內滿足過濾條件 _func 的 Card 組成的 Group,  _val 為 _func 的參數
+*注意 _func 應為 Card 的判斷函數
+
 ●void fusf.RegFlag(tp_or_c, cod, res, pro[, lab, des])
 为卡片 c 或玩家 tp 注册一个标识用效果
 效果代码为 cod  ，描述为 des ，标签为 lab ，这个效果会在达到 res 时点重置， pro 一般写0即可
@@ -3898,6 +3931,10 @@ val = tp or e or c
 cod = String or number (+20000000)
 n1 = "+-n", "+-"
 n2 = n
+
+●bool fusf.Equip(e, p, ec, c)
+让玩家 p 把卡片 ec 作为装备卡装备给卡片 c，返回值表示是否成功
+會同時註冊裝備對象限制
 
 ================Card Function================
 ●Bool fucf.Filter(c, S|F f, ...)
@@ -3952,6 +3989,15 @@ nol : 是否忽略检查卡片 c 的苏生限制
 
 ●Bool fucf.HasCode(c, cod)
 检查卡片 c 是否是有卡名 cod 记述的卡
+
+●Bool fucf.CanEq(c, tp)
+检查卡片 c 是否可以装备在 tp 场上
+
+●Bool fucf.IsFlagLab(c, code, lab)
+检查卡片 c 的种类为 code 的标识效果的 Label 是否是 lab
+
+●Bool fucf.InGroup(c, G)
+检查卡片 c 是否在卡片组 G
 
 ●Bool fucf.TgChk(c[, e])
 检查卡片 c 能否成為 [e 的] 效果對象
@@ -4149,6 +4195,9 @@ D   --守备表示
 若 f 或 v 含有 %i , 則表示為 ... 中的第 i 個
 若有 n 返回 #g >= n
 
+●function fugf.GetNoP(S loc, S|F f[, Any v, N n, ...])
+創建一個傳入 p 會傳回 GetFilter 返回值的函數
+
 ●Group fugf.Select(p, S|G g[, S|F f[, Any v, N min = 1, N max = min, ...])
 若 g 為 S 則卡片組 g 為 fugf.Get(p, g)
 以 tp 来看的 loc (自己以及對方區域以+分開)位置的卡中满足筛选条件 f 的卡， v 為 f 的參數
@@ -4204,11 +4253,16 @@ ignore = true 則無視免疫
 ●fuef fuef.PreChk(from, ...)
 檢測 ... IsNil 或無 self.e, 若 fuef.DebugMode 為 true 則印出錯誤
 
-●fuef fuef.Debug(S msg)
-若處於調適模式( fuef.DebugMode = true )則印出 msg
+●void fuef.Info()
+印出 fuef 細則
 
-●fuef fuef.I() or (owner[, cod, handler, ignore])
+●fuef fuef.Proc_XYZ([F cf = nil, F gf = nil, N min = 1, N max = 99, S ex_loc = nil])
+創建超量召喚手續, cf 為每個超量素材必須滿足的條件, gf 為超量素材組必須滿足的條件
+若有 ex_loc 則可以使用 ex_loc 內的卡作為超量素材
+
+●fuef fuef.I(handler) or (owner[, cod, handler, ignore])
 Ignition
+handler == false 則不註冊
 接受 Key : cat, pro, ran, ctl, con, cos, tg, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
@@ -4222,69 +4276,81 @@ Activate
 接受 Key : cat, pro, ran, ctl, con, cos, tg, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.QO(cod or "FC") or (owner[, cod, handler, ignore])
+●fuef fuef.QO(cod or "FC", handler) or (owner[, cod, handler, ignore])
 QUICK_O
+handler == false 則不註冊
 接受 Key : cat, pro, ran, ctl, con, cos, tg, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.QF(cod or "FC") or (owner[, cod, handler, ignore])
+●fuef fuef.QF(cod or "FC", handler) or (owner[, cod, handler, ignore])
 QUICK_F
+handler == false 則不註冊
 接受 Key : cat, pro, ran, ctl, con, cos, tg, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.FTO(cod) or (owner[, cod, handler, ignore])
+●fuef fuef.FTO(cod, handler) or (owner[, cod, handler, ignore])
 FIELD + TRIGGER_O
+handler == false 則不註冊
 接受 Key : cat, pro, ran, ctl, con, cos, tg, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.FTF(cod) or (owner[, cod, handler, ignore])
+●fuef fuef.FTF(cod, handler) or (owner[, cod, handler, ignore])
 FIELD + TRIGGER_F
+handler == false 則不註冊
 接受 Key : cat, pro, ran, ctl, con, cos, tg, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.STO(cod) or (owner[, cod, handler, ignore])
+●fuef fuef.STO(cod, handler) or (owner[, cod, handler, ignore])
 SINGLE + TRIGGER_O
-cod = cod or "FC"
+handler == false 則不註冊
 接受 Key : cat, pro, ctl, con, cos, tg, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.STF(cod) or (owner[, cod, handler, ignore])
+●fuef fuef.STF(cod, handler) or (owner[, cod, handler, ignore])
 SINGLE + TRIGGER_F
+handler == false 則不註冊
 接受 Key : cat, pro, ctl, con, cos, tg, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.S(cod) or (owner[, cod, handler, ignore])
+●fuef fuef.S(cod, handler) or (owner[, cod, handler, ignore])
 SINGLE
+handler == false 則不註冊
 接受 Key : pro, ran, val, ctl, con, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.SC(cod) or (owner[, cod, handler, ignore])
+●fuef fuef.SC(cod, handler) or (owner[, cod, handler, ignore])
 SINGLE + CONTINUOUS
+handler == false 則不註冊
 接受 Key : pro, ran, ctl, con, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.F(cod) or (owner[, cod, handler, ignore])
+●fuef fuef.F(cod, handler) or (owner[, cod, handler, ignore])
 FIELD
+handler == false 則不註冊
 接受 Key : pro, ran, tran, val, ctl, con, tg, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.FC(cod) or (owner[, cod, handler, ignore])
+●fuef fuef.FC(cod, handler) or (owner[, cod, handler, ignore])
 FIELD + CONTINUOUS
+handler == false 則不註冊
 接受 Key : pro, ran, ctl, con, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.E(cod) or (owner[, cod, handler, ignore])
+●fuef fuef.E(cod, handler) or (owner[, cod, handler, ignore])
 Equip
+handler == false 則不註冊
 接受 Key : pro, val, con
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.EC(cod) or (owner[, cod, handler, ignore])
+●fuef fuef.EC(cod, handler) or (owner[, cod, handler, ignore])
 Equip + CONTINUOUS
+handler == false 則不註冊
 接受 Key : con, tg, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
-●fuef fuef.X(cod) or (owner[, cod, handler, ignore])
+●fuef fuef.X(cod, handler) or (owner[, cod, handler, ignore])
 XMATERIAL
+handler == false 則不註冊
 接受 Key : pro, ran, val, ctl, con, op
 若為 (cod) 調用 fuef(owner[, handler, ignore]) 即會註冊
 
@@ -4436,7 +4502,7 @@ PH   --阶段结束重置
 STD  --TF + LEA + TD + TH + TRE + RE + TG + SET
 RED  --STD + O + MSC - TF - LEA (EFFECT_LEAVE_FIELD_REDIRECT)
 
-●fuef fuef.initial(_lib, _glo, _exop_func, ...)
+●cm, m fuef.initial(_lib, _glo, _exop_func, ...)
 設定 cm 的 initial_effect 並設定 cm.lib = _lib
 若有 _glo 則 cm[_glo] = {0, 0}
 若有 _ex_op 則執行 _ex_op(c, cm)
