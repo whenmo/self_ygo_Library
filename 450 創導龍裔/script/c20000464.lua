@@ -5,7 +5,7 @@ cm.e1 = fuef.A():CAT("REL+SP+EQ"):Func("tg1,op1")
 cm.e2 = fuef.I():CAT("EQ"):RAN("G"):PRO("TG"):Func("bfgcost,tg2,op2")
 --e1
 function cm.tg1f2(c, tp)
-	return fucf.Filter(c, "IsLoc+IsPublic", "H") and fugf.GetFilter(tp, "HG", "CanEq+IsLv+Not", {tp, -c:GetLevel(), c}, 1)
+	return fucf.Filter(c, "IsLoc+IsPublic", "H") and fugf.GetFilter(tp, "HG", "IsTyp+IsRac+CanEq+IsLv+Not", {"RI+M,DR", tp, -c:GetLevel(), c}, 1)
 end
 function cm.tg1f(rc, e, tp, mg)
 	if not fucf.Filter(rc, "IsTyp+IsCode+CanSp", "RI+M,463", {e, "RI", tp}) then return false end
@@ -15,9 +15,6 @@ end
 function cm.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return fugf.GetFilter(tp,"D",cm.tg1f,{e,tp,Duel.GetRitualMaterial(tp)},1) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
-end
-function cm.op1con1(e)
-	return e:GetHandler():GetEquipCount() == 0
 end
 function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 	local mg = Duel.GetRitualMaterial(tp)
@@ -34,9 +31,10 @@ function cm.op1(e,tp,eg,ep,ev,re,r,rp)
 	rc:CompleteProcedure()
 	local mc = mg:GetFirst()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	mc = fugf.Select(tp, "HG", "CanEq+IsLv", {tp, -mc:GetLevel()}):GetFirst()
+	mc = fugf.Select(tp, "HG", "IsTyp+IsRac+CanEq+IsLv", {"RI+M,DR", tp, -mc:GetLevel()}):GetFirst()
 	fusf.Equip(e,tp,mc,rc)
-	fuef.S(e, EFFECT_SELF_DESTROY, rc):PRO("SR"):RAN("M"):CON("op1con1"):RES("STD")
+	local selfdescon = function(e) return e:GetHandler():GetEquipCount() == 0 end
+	fuef.S(e, EFFECT_SELF_DESTROY, rc):PRO("SR"):RAN("M"):CON(selfdescon):RES("STD")
 end
 --e2
 function cm.tg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

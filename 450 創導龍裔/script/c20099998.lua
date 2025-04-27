@@ -459,7 +459,6 @@ function fusf.GetFlag(val, cod) -- val : Card|Effect|player(number)
 end
 function fusf.Equip(e,tp,ec,c)
 	if not (ec and c and Duel.Equip(tp, ec, c)) then return false end
-	local eq = function(e, c) return e:GetOwner() == c end
-	fuef.S(e, EFFECT_EQUIP_LIMIT, ec):PRO(EFFECT_FLAG_OWNER_RELATE):VAL(eq):RES("STD")
-	return true
+	local eq = function(e, c) return c == e:GetLabelObject() end
+	return fuef.S(e, EFFECT_EQUIP_LIMIT, ec):PRO("CD"):VAL(eq):OBJ(c):RES("STD")
 end
